@@ -592,7 +592,7 @@ function enterCloud(api,pics,uid,name){
   try{Store.unwatch=api.watch(onSnap,e=>{clearTimeout(Store.loadT);setSync(e&&e.code==='setup'?'setup':'stale')})}catch(e){setSync('stale')}
 }
 function enterLocal(){resetState();Store.mode='local';Store.api=null;Store.pics=idbPics;Store.name='';Store.lkey='sjsz:local';loadLocal();REV++;render(true);setSync('local')}
-function showAuth(){Store.mode='auth';Store.sync='auth';UI.auth=UI.auth||{tab:'pw',sent:false,email:'',msg:'',ok:false};render(true)}
+function showAuth(){Store.mode='auth';Store.sync='auth';UI.auth=UI.auth||{tab:'otp',sent:false,email:'',msg:'',ok:false};render(true)}
 function signedIn(session){if(!session||!session.user)return;const u=session.user;try{localStorage.removeItem('sjsz:skip')}catch(e){}enterCloud(supaApi(Store.sb,u.id),supaPics(Store.sb,u.id),u.id,u.email||'')}
 function supaCfg(){return SUPABASE_URL&&SUPABASE_KEY?{url:SUPABASE_URL,key:SUPABASE_KEY}:null}
 function loadScript(src){return new Promise((res,rej)=>{if(window.supabase&&window.supabase.createClient)return res();const s=document.createElement('script');s.src=src;s.onload=()=>res();s.onerror=()=>rej(new Error('load'));document.head.appendChild(s)})}
@@ -877,6 +877,8 @@ function vPrefs(){
 
 /* ========== 登录（独立部署版，Supabase） ========== */
 function authErr(e){const m=(e&&e.message)||'';
+  if(/email address not authorized|only.*(authorized|pre-authorized)|email.*not.*allowed|email.*address.*not.*verified/i.test(m))return'当前发信服务只允许向项目成员邮箱发送邮件，请先配置自定义 SMTP';
+  if(/error sending|smtp|email.*delivery/i.test(m))return'邮件未能发送，请检查 Supabase 的发信服务配置后重试';
   if(/invalid login credentials/i.test(m))return'邮箱或密码不正确';
   if(/email not confirmed/i.test(m))return'邮箱还没验证：请先点注册邮件里的确认链接，或改用「邮箱验证码」登录';
   if(/already registered|already been registered/i.test(m))return'这个邮箱已注册，直接登录即可';
@@ -1051,7 +1053,7 @@ const SUB={
   async authPw(f){const email=f.elements.email.value.trim(),b=f.querySelector('.pri');UI.auth.email=email;b.disabled=true;
     try{const{data,error}=await Store.sb.auth.signInWithPassword({email,password:f.elements.pw.value});if(error)throw error;if(Store.mode!=='cloud')signedIn(data.session)}catch(e){authMsg(authErr(e));b.disabled=false}},
   async authSend(f){const email=f.elements.email.value.trim(),b=f.querySelector('.pri');UI.auth.email=email;b.disabled=true;
-    try{const{error}=await Store.sb.auth.signInWithOtp({email,options:{shouldCreateUser:true}});if(error)throw error;UI.auth.sent=true;UI.auth.msg='邮件已发出。输入里面的验证码；如果邮件里只有链接，直接点链接也能登录。';UI.auth.ok=true;UI.focus='#au-code';render(true)}catch(e){authMsg(authErr(e));b.disabled=false}},
+    try{const{error}=await Store.sb.auth.signInWithOtp({email,options:{shouldCreateUser:true,emailRedirectTo:location.origin+location.pathname}});if(error)throw error;UI.auth.sent=true;UI.auth.msg='邮件已发出。输入里面的验证码；如果邮件里只有链接，直接点链接也能登录。';UI.auth.ok=true;UI.focus='#au-code';render(true)}catch(e){authMsg(authErr(e));b.disabled=false}},
   async authVerify(f){const b=f.querySelector('.pri');b.disabled=true;
     try{const{data,error}=await Store.sb.auth.verifyOtp({email:UI.auth.email,token:f.elements.code.value.trim(),type:'email'});if(error)throw error;if(Store.mode!=='cloud')signedIn(data.session)}catch(e){authMsg(authErr(e));b.disabled=false}},
   async pwSet(f){const b=f.querySelector('button');b.disabled=true;try{const{error}=await Store.sb.auth.updateUser({password:f.elements.pw.value});if(error)throw error;f.reset();toast('密码已更新，下次可以用邮箱 + 密码登录')}catch(e){toast(authErr(e))}b.disabled=false},
