@@ -3,10 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FCE5C6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="四季手账">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" id="fav" href="data:,">
 <title>四季手账</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <style>
 /* 布局：左侧导航 + 主区；主区顶部是一页"日历纸"色带（随季节变化），其余保持安静 */
 :root{
@@ -16,7 +22,7 @@
   --good:#2E8B57;--warn:#B77A00;--bad:#C8413B;
   --c1:#2a78d6;--c2:#eb6834;--c3:#1baf7a;--c4:#eda100;--c5:#e87ba4;--c6:#008300;--c7:#6250d6;--c8:#e34948;
   --font-display:"ZCOOL XiaoWei","Songti SC","STSong","SimSun",serif;
-  --font-body:"Figtree","PingFang SC","HarmonyOS Sans SC","Microsoft YaHei UI","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  --font-body:"Figtree","PingFang SC","Noto Sans SC","HarmonyOS Sans SC","Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;
   --r:14px;
   color-scheme:light;
 }
@@ -365,6 +371,29 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--in
 .foot-m{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;padding:7px 0;border-top:1px solid var(--line);font-size:14px;align-items:baseline}
 .card>h2+.foot-m{border-top:0}
 @media (max-width:480px){#tabbar{padding-left:2px;padding-right:2px}#tabbar a{font-size:10px}#tabbar a svg{width:18px;height:18px}}
+/* 通透质感：磨砂玻璃卡片 + 果冻按钮 */
+:root{--hi:rgba(255,255,255,.7);--glass:76%;--r:18px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hi:rgba(255,255,255,.08);--glass:68%}}
+:root[data-theme="dark"]{--hi:rgba(255,255,255,.08);--glass:68%}
+.logo{width:38px;height:38px;flex:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.14))}
+.hero{box-shadow:inset 0 1px 0 var(--hi),0 16px 36px -24px rgba(var(--accent-rgb),.7)}
+.hero::after{content:"";position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0));pointer-events:none;z-index:0}
+.hero>*:not(canvas){z-index:1}
+.btn.pri{background-image:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,0) 54%);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 14px -8px rgba(var(--accent-rgb),.9)}
+.btn,.inp{border-radius:12px}
+.chip{backdrop-filter:none}
+@supports (background:color-mix(in srgb,red 50%,transparent)){
+  .card,.kpi,.proj{background:color-mix(in srgb,var(--surface) var(--glass),transparent);-webkit-backdrop-filter:blur(18px) saturate(1.35);backdrop-filter:blur(18px) saturate(1.35);border-color:color-mix(in srgb,var(--line) 50%,transparent);box-shadow:inset 0 1px 0 var(--hi),0 12px 30px -22px rgba(var(--accent-rgb),.55)}
+  .wd,.cal-d,.stage{background:color-mix(in srgb,var(--surface) 58%,transparent);border-color:color-mix(in srgb,var(--line) 60%,transparent)}
+  #tabbar,#remindbar{background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
+  .inp{background:color-mix(in srgb,var(--surface) 86%,transparent)}
+  .btn{background:color-mix(in srgb,var(--surface) 82%,transparent)}
+  .btn.pri{background-color:var(--accent)}
+  .btn.ghost{background:transparent}
+  .dlg{background:color-mix(in srgb,var(--surface) 92%,transparent);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px)}
+}
+.bill button.nm{text-align:left}
+.bill button.nm:hover{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -484,9 +513,9 @@ const SUPA_CDN='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/
 const Store={host:'web',api:null,pics:null,sb:null,uid:null,name:'',mode:'boot',dirty:new Set(),writing:{},lastJson:{},known:new Set(),synced:false,readonly:false,sync:'boot',timer:0,lkey:'sjsz:local',downloads:null,sample:null,unwatch:null};
 function docData(id){if(id==='meta')return S.meta;if(id.startsWith('m-'))return S.months[id.slice(2)];return S.projects[id.slice(2)]}
 function applyDoc(id,data){if(id==='meta')S.meta={...defaultMeta(),...data};else if(id.startsWith('m-')){S.months[id.slice(2)]=data;month(id.slice(2))}else if(id.startsWith('p-'))S.projects[id.slice(2)]=data}
-let lsT=0;function saveLocal(){clearTimeout(lsT);lsT=setTimeout(()=>{try{localStorage.setItem(Store.lkey,JSON.stringify({S,known:[...Store.known]}))}catch(e){}},300)}
+let lsT=0;function saveLocal(){clearTimeout(lsT);lsT=setTimeout(()=>{try{localStorage.setItem(Store.lkey,JSON.stringify({S,known:[...Store.known],dirty:[...Store.dirty],seenU:Store.seenU||{}}))}catch(e){}},300)}
 function readLocal(key){try{const raw=localStorage.getItem(key);if(!raw)return null;const o=JSON.parse(raw);return o&&o.S?o:null}catch(e){return null}}
-function loadLocal(){const o=readLocal(Store.lkey);if(!o)return;S.meta={...defaultMeta(),...(o.S.meta||{})};S.months=o.S.months||{};S.projects=o.S.projects||{};for(const ym in S.months)month(ym);Store.known=new Set(o.known||[])}
+function loadLocal(){const o=readLocal(Store.lkey);if(!o)return;S.meta={...defaultMeta(),...(o.S.meta||{})};S.months=o.S.months||{};S.projects=o.S.projects||{};for(const ym in S.months)month(ym);Store.known=new Set(o.known||[]);if(Store.mode==='cloud'){Store.dirty=new Set((o.dirty||[]).filter(x=>typeof x==='string'));Store.seenU=o.seenU||{}}}
 function touch(id){if(id==='meta')S.meta.u=Date.now();else if(id.startsWith('p-')&&S.projects[id.slice(2)])S.projects[id.slice(2)].u=Date.now();Store.dirty.add(id);saveLocal();if(Store.mode==='cloud'&&!Store.readonly){setSync('saving');clearTimeout(Store.timer);Store.timer=setTimeout(flush,700)}}
 function commit(...docs){REV++;docs.forEach(touch);render(true)}
 function mergeMonth(L,R){
@@ -506,10 +535,14 @@ async function flush(){
     try{
       if(id.startsWith('m-')){const ym=id.slice(2);let remote=null;try{remote=await Store.api.get(id)}catch(e){}
         if(remote&&S.months[ym]){const before=canon(S.months[ym]);S.months[ym]=mergeMonth(S.months[ym],remote);if(canon(S.months[ym])!==before)merged=true}}
+      else if(docData(id)!=null){let remote=null;try{remote=await Store.api.get(id)}catch(e){}
+        if(remote&&(remote.u||0)!==(Store.seenU[id]||0)&&canon(remote)!==canon(docData(id))){
+          if(id==='meta'){S.meta=mergeMeta(S.meta,{...defaultMeta(),...remote});merged=true}
+          else if((remote.u||0)>(docData(id).u||0)){applyDoc(id,remote);Store.seenU[id]=remote.u||0;Store.lastJson[id]=canon(remote);Store.dirty.delete(id);Store.writing[id]=false;merged=true;continue}}}
       Store.dirty.delete(id);
       const data=docData(id);
-      if(data==null){await Store.api.del(id);Store.known.delete(id);delete Store.lastJson[id]}
-      else{Store.lastJson[id]=canon(data);await Store.api.set(id,clone(data));Store.known.add(id)}
+      if(data==null){await Store.api.del(id);Store.known.delete(id);delete Store.lastJson[id];delete Store.seenU[id]}
+      else{Store.lastJson[id]=canon(data);await Store.api.set(id,clone(data));Store.known.add(id);Store.seenU[id]=data.u||0}
     }catch(e){
       Store.dirty.add(id);Store.writing[id]=false;const code=e&&e.code;
       if(code==='invalid_argument'||code==='revoked'||code==='not_granted'){Store.readonly=true;setSync('readonly');return}
@@ -519,16 +552,16 @@ async function flush(){
     Store.writing[id]=false;
   }
   if(merged){REV++;saveLocal();render()}
-  if(Store.dirty.size||again){clearTimeout(Store.timer);Store.timer=setTimeout(flush,400)}else setSync('ok');
+  if(Store.dirty.size||again){clearTimeout(Store.timer);Store.timer=setTimeout(flush,400)}else{setSync('ok');saveLocal()}
 }
 const SYNC_TXT={boot:'正在连接…',local:'仅保存在本设备',connecting:'正在同步…',ok:'已同步到云端',saving:'同步中…',stale:'云端暂时连不上，稍后自动重试',readonly:'只读：无法写入云端',quota:'云端空间已满，请删除旧数据',setup:'云端数据库还没初始化（需运行建库脚本）',auth:'登录后开始同步'};
 function setSync(s){Store.sync=s;const cls=s==='ok'?'ok':(s==='saving'||s==='connecting'||s==='boot')?'saving':s==='local'?'':'bad';document.querySelectorAll('.sync').forEach(el=>{el.className='sync '+cls;el.lastChild.textContent=SYNC_TXT[s]||s})}
 /* snap: {docs:[{id,data}], definitive} —— 两种云端都整理成这个形状 */
 function onSnap(snap){
   let changed=false;const seen=new Set();
-  for(const d of snap.docs){seen.add(d.id);if(Store.dirty.has(d.id)||Store.writing[d.id])continue;const json=canon(d.data);if(Store.lastJson[d.id]===json)continue;Store.lastJson[d.id]=json;if(canon(docData(d.id)??null)!==json){applyDoc(d.id,clone(d.data));changed=true}}
+  for(const d of snap.docs){seen.add(d.id);if(Store.dirty.has(d.id)||Store.writing[d.id])continue;const json=canon(d.data);if(Store.lastJson[d.id]===json)continue;Store.lastJson[d.id]=json;Store.seenU[d.id]=(d.data&&d.data.u)||0;if(canon(docData(d.id)??null)!==json){applyDoc(d.id,clone(d.data));changed=true}}
   if(snap.definitive){
-    if(!Store.synced){Store.synced=true;clearTimeout(Store.loadT);
+    if(!Store.synced){Store.synced=true;clearTimeout(Store.loadT);if(Store.dirty.size){clearTimeout(Store.timer);Store.timer=setTimeout(flush,300)}
       if(!seen.size&&adoptLocal())changed=true;
       else{for(const ym in S.months)if(!seen.has('m-'+ym)&&Object.keys(S.months[ym].tasks||{}).length)touch('m-'+ym);
         if(!seen.has('meta'))touch('meta');
@@ -584,7 +617,7 @@ const idbPics={
   async url(p){const b=await idbGet(p.id);return b?URL.createObjectURL(b):null},
   async del(p){const d=await idbOpen();await new Promise(res=>{const tx=d.transaction('pics','readwrite');tx.objectStore('pics').delete(p.id);tx.oncomplete=res;tx.onerror=res})}};
 
-function resetState(){S.meta=defaultMeta();S.months={};S.projects={};Store.dirty.clear();Store.writing={};Store.lastJson={};Store.known=new Set();Store.synced=false;Store.readonly=false;Pics.ready={};clearTimeout(Store.timer);clearTimeout(Store.loadT)}
+function resetState(){S.meta=defaultMeta();S.months={};S.projects={};Store.dirty.clear();Store.seenU={};Store.writing={};Store.lastJson={};Store.known=new Set();Store.synced=false;Store.readonly=false;Pics.ready={};clearTimeout(Store.timer);clearTimeout(Store.loadT)}
 function enterCloud(api,pics,uid,name){
   if(Store.unwatch){try{Store.unwatch()}catch(e){}Store.unwatch=null}
   resetState();Store.mode='cloud';Store.api=api;Store.pics=pics;Store.uid=uid;Store.name=name||'';Store.lkey='sjsz:'+uid;loadLocal();REV++;setSync('connecting');render(true);
@@ -593,7 +626,7 @@ function enterCloud(api,pics,uid,name){
 }
 function enterLocal(){resetState();Store.mode='local';Store.api=null;Store.pics=idbPics;Store.name='';Store.lkey='sjsz:local';loadLocal();REV++;render(true);setSync('local')}
 function showAuth(){Store.mode='auth';Store.sync='auth';UI.auth=UI.auth||{tab:'otp',sent:false,email:'',msg:'',ok:false};render(true)}
-function signedIn(session){if(!session||!session.user)return;const u=session.user;try{localStorage.removeItem('sjsz:skip')}catch(e){}enterCloud(supaApi(Store.sb,u.id),supaPics(Store.sb,u.id),u.id,u.email||'')}
+function signedIn(session){if(!session||!session.user)return;const u=session.user;try{localStorage.removeItem('sjsz:skip');localStorage.setItem('sjsz:last',JSON.stringify({uid:u.id,email:u.email||''}))}catch(e){}enterCloud(supaApi(Store.sb,u.id),supaPics(Store.sb,u.id),u.id,u.email||'')}
 function supaCfg(){return SUPABASE_URL&&SUPABASE_KEY?{url:SUPABASE_URL,key:SUPABASE_KEY}:null}
 function loadScript(src){return new Promise((res,rej)=>{if(window.supabase&&window.supabase.createClient)return res();const s=document.createElement('script');s.src=src;s.onload=()=>res();s.onerror=()=>rej(new Error('load'));document.head.appendChild(s)})}
 async function boot(){
@@ -608,11 +641,19 @@ async function boot(){
     return;
   }
   Store.host='web';const cfg=supaCfg();
-  if(!cfg){enterLocal();return}
+  if(!cfg){pwaSetup();enterLocal();return}
   try{await loadScript(SUPA_CDN);Store.sb=window.supabase.createClient(cfg.url,cfg.key)}catch(e){enterLocal();toast('登录组件没有加载出来，先以本机模式打开');return}
-  let session=null;try{const r=await Store.sb.auth.getSession();session=r.data&&r.data.session}catch(e){}
-  if(session)signedIn(session);else{let skip=false;try{skip=localStorage.getItem('sjsz:skip')==='1'}catch(e){}if(skip)enterLocal();else showAuth()}
-  Store.sb.auth.onAuthStateChange((ev,s)=>{setTimeout(()=>{if(ev==='SIGNED_IN'&&s&&Store.mode==='auth')signedIn(s);else if(ev==='SIGNED_OUT'&&Store.mode==='cloud')location.reload()},0)});
+  let session=null,netErr=false,last=null;try{last=JSON.parse(localStorage.getItem('sjsz:last')||'null')}catch(e){}
+  const canOff=!!(last&&last.uid&&readLocal('sjsz:'+last.uid)),isNet=e=>!!e&&(e.name==='AuthRetryableFetchError'||/fetch|network|load failed/i.test(e.message||''));
+  // 没网时刷新登录凭证会一直重试：有本机缓存就不等它，先打开
+  const gs=Store.sb.auth.getSession().catch(e=>({data:{session:null},error:{name:'AuthRetryableFetchError',message:String(e)}}));
+  const r=canOff?await Promise.race([gs,new Promise(res=>setTimeout(()=>res(null),navigator.onLine===false?400:3000))]):await gs;
+  if(!r){netErr=true;gs.then(x=>{if(Store.mode!=='cloud')return;if(x&&x.data&&x.data.session){try{dispatchEvent(new Event('online'))}catch(e){}}else if(x&&!isNet(x.error)){try{localStorage.removeItem('sjsz:last')}catch(e){}location.reload()}})}
+  else{session=r.data&&r.data.session;if(!session&&isNet(r.error))netErr=true}
+  pwaSetup();
+  if(!session&&canOff&&netErr){enterCloud(supaApi(Store.sb,last.uid),supaPics(Store.sb,last.uid),last.uid,last.email||'');toast('现在没有网络，先显示本机保存的数据，联网后自动同步')}
+  else if(session)signedIn(session);else{let skip=false;try{skip=localStorage.getItem('sjsz:skip')==='1'}catch(e){}if(skip)enterLocal();else showAuth()}
+  Store.sb.auth.onAuthStateChange((ev,s)=>{setTimeout(()=>{if(ev==='SIGNED_IN'&&s&&Store.mode==='auth')signedIn(s);else if(ev==='SIGNED_OUT'&&Store.mode==='cloud'){try{localStorage.removeItem('sjsz:last')}catch(e){}location.reload()}},0)});
 }
 
 /* ========== 渲染：公共 ========== */
@@ -623,14 +664,14 @@ const ico=k=>`<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-
 function renderSide(){
   const links=NAV.map(([k,n])=>`<a href="#${k}" ${UI.view===k?'aria-current="page"':''}>${ico(k)}<span>${({day:'每日',week:'一周',month:'一月',year:'一年',projects:'长线项目',money:'记账',report:'周报 · 月报 · 年报',prefs:'标签与设置'})[k]}</span></a>`).join('');
   const st=streak();
-  $('#side').innerHTML=`<div class="brand"><span class="seal">${SEASON_CN[document.documentElement.dataset.season]}</span><b>四季手账</b></div>
+  $('#side').innerHTML=`<div class="brand"><img class="logo" src="${APP_ICON}" alt=""><b>四季手账</b></div>
   <nav class="nav" aria-label="视图">${links}</nav>
   <div class="streak"><b class="num">${st}</b>天连续完成事项</div>
   <div class="side-foot"><span style="overflow-wrap:anywhere">${Store.mode==='cloud'?esc(Store.name||(Store.host==='claude'?'已用 Claude 账号登录':'已登录')):'未登录'}</span><span class="sync"><i></i><span></span></span></div>`;
   $('#tabbar').innerHTML=NAV.map(([k,n])=>`<a href="#${k}" ${UI.view===k?'aria-current="page"':''}>${ico(k)}${n}</a>`).join('');
   setSync(Store.sync);
 }
-function applySeason(){const d=['day','week','month','money','report'].includes(UI.view)?UI.date:today();const s=seasonFor(d);if(document.documentElement.dataset.season!==s)document.documentElement.dataset.season=s;PAL=null}
+function applySeason(){const d=['day','week','month','money','report'].includes(UI.view)?UI.date:today();const s=seasonFor(d);if(document.documentElement.dataset.season!==s)document.documentElement.dataset.season=s;try{const tc=document.querySelector('meta[name=theme-color]'),v=getComputedStyle(document.documentElement).getPropertyValue('--bg1').trim();if(tc&&v)tc.content=v}catch(e){}PAL=null}
 function hero(){
   const v=UI.view,d=UI.date,D=parse(d),td=today();let big,title,sub,isNow=true,nowLabel='';
   if(v==='day'){const ti=termInfo(d);big=`${D.getDate()}<small>日</small>`;title=`${CNM[D.getMonth()]}月 · 星期${WD[D.getDay()]}`;sub=`${D.getFullYear()} 年 · ${ti.since===0?'今日'+ti.cur.n:ti.cur.n+'第 '+(ti.since+1)+' 天'} · 距${ti.next.n} ${ti.until} 天`;isNow=d===td;nowLabel='回到今天'}
@@ -682,7 +723,7 @@ function actList(st){
   const tot=q?`<div class="actrow"><span class="nm"><b>匹配 ${rows.length} 项合计</b></span><span class="n">${rows.reduce((a,r)=>a+r[1].n,0)} 次</span><b class="num">${fmtMin(rows.reduce((a,r)=>a+r[1].min,0))}</b></div>`:'';
   return tot+rows.slice(0,q?30:8).map(([k,e])=>`<div class="actrow"><span class="nm"><i class="dot" style="background:${tagColor(e.g)}"></i><span>${esc(k)}</span></span><span class="n">${e.n} 次</span><span class="num">${e.min?fmtMin(e.min):'—'}</span></div>`).join('');
 }
-function delta(cur,prev,unit){if(!prev)return `<em>上期无记录</em>`;const d=Math.round((cur-prev)/prev*100);return `<em class="${d>0?'up':d<0?'down':''}">${d>0?'↑':d<0?'↓':'持平'}${d?Math.abs(d)+'%':''} 较上期</em>`}
+function delta(cur,prev,unit){if(!prev)return `<em>上期同期无记录</em>`;const d=Math.round((cur-prev)/prev*100);return `<em class="${d>0?'up':d<0?'down':''}">${d>0?'↑':d<0?'↓':'持平'}${d?Math.abs(d)+'%':''} 较上期同期</em>`}
 function statsBlock(v,st,pv,days){
   const rate=st.all?Math.round(st.done/st.all*100):0;
   return `<section class="sum">
@@ -701,7 +742,7 @@ function taskRow(t){
   const m=tmin(t),run=S.meta.running&&S.meta.running.id===t.id,p=t.pid&&S.projects[t.pid];
   const meta=[`<span><i class="dot" style="background:${tagColor(t.g)}"></i>${esc(tagName(t.g))}</span>`];
   if(t.plan)meta.push(`<span>计划 ${fmtMin(t.plan)}</span>`);
-  if(t.rm&&!t.done)meta.push(`<span>提醒 ${t.rm}</span>`);if(t.rid)meta.push('<span>↻ 例行</span>');if(t.adhoc)meta.push('<span>计划外</span>');if(t.mv)meta.push(`<span>已顺延 ${t.mv} 次</span>`);
+  if(t.rm&&!t.done)meta.push(`<span>提醒 ${esc(t.rm)}</span>`);if(t.rid)meta.push('<span>↻ 例行</span>');if(t.adhoc)meta.push('<span>计划外</span>');if(t.mv)meta.push(`<span>已顺延 ${t.mv} 次</span>`);
   if(p)meta.push(`<span>◆ ${esc(p.name)}</span>`);if(t.done&&t.at)meta.push(`<span>${hm(t.at)} 完成</span>`);
   let side='';const a=`data-d="${t.d}" data-id="${t.id}"`;
   if(t.done){
@@ -768,7 +809,7 @@ function itemsList(d,max){
   return `<ul class="its">${its.slice(0,max).map(t=>{const od=!t.done&&d<td;return `<li class="${t.done?'d':od?'od':''}" style="--tc:${tagColor(t.g)}">${t.done?CHK:'<i></i>'}<span>${t.star?'★ ':''}${esc(t.t)}${od?'<span class="sr">（逾期未完成）</span>':t.done?'<span class="sr">（已完成）</span>':''}</span></li>`}).join('')}${its.length>max?`<li class="more"><span>还有 ${its.length-max} 项</span></li>`:''}</ul>`;
 }
 function vWeek(){
-  const[a,b]=rangeOf('week',UI.date),st=calc(a,b),pa=shift('week',a,-1),pv=calc(pa,addDays(pa,6)),td=today();
+  const[a,b]=rangeOf('week',UI.date),st=calc(a,b),pv=calcPrev('week',a,b),td=today();
   const days=[...Array(7)].map((_,i)=>addDays(a,i));
   const cols=days.map(d=>{const x=st.byDay[d]||{min:0,byTag:{}};return{label:'周'+WD[parse(d).getDay()],min:x.min,byTag:x.byTag,d,act:'goDay',cur:d===td,tip:mdCN(d)}});
   return `<section class="card"><div class="sec-h">这一周做了什么 <small>打勾的是做完的，红色是逾期没做的；点某一天进入当天</small></div>
@@ -780,7 +821,7 @@ function lvl(x){if(!x)return 0;if(UI.metric==='cnt'){const n=x.done;return n>=8?
 function metricSeg(){return `<span class="seg" role="group" aria-label="热度依据"><button data-act="metric" data-m="min" aria-pressed="${UI.metric==='min'}">按用时</button><button data-act="metric" data-m="cnt" aria-pressed="${UI.metric==='cnt'}">按完成数</button></span>`}
 function scaleKey(){return `<span class="scale">少<i></i><i class="h1"></i><i class="h2"></i><i class="h3"></i><i class="h4"></i>多</span>`}
 function vMonth(){
-  const[a,b]=rangeOf('month',UI.date),st=calc(a,b),pa=shift('month',a,-1),pv=calc(...rangeOf('month',pa)),td=today(),n=diffDays(a,b)+1,lead=(parse(a).getDay()+6)%7;
+  const[a,b]=rangeOf('month',UI.date),st=calc(a,b),pv=calcPrev('month',a,b),td=today(),n=diffDays(a,b)+1,lead=(parse(a).getDay()+6)%7;
   let cells='';for(let i=0;i<lead;i++)cells+='<span></span>';
   for(let i=0;i<n;i++){const d=addDays(a,i),x=st.byDay[d],its=dayItems(d),od=d<td?its.filter(t=>!t.done).length:0,np=dayPics(d).length;
     cells+=`<button class="cal-d ${d===td?'today':''}" data-act="goDay" data-d="${d}" aria-label="${mdCN(d)}，完成 ${x?x.done:0}/${its.length}${od?`，逾期 ${od} 项`:''}"><span class="ch"><b class="num">${i+1}</b><span class="cnt">${its.length?`${x?x.done:0}/${its.length}`:''}${x&&x.min?' · '+fmtH(x.min):''}${np?` · ${np}图`:''}</span></span>${itemsList(d,4)}</button>`}
@@ -789,7 +830,7 @@ function vMonth(){
   ${statsBlock('month',st,pv,n)}`;
 }
 function vYear(){
-  const y=+UI.date.slice(0,4),a=y+'-01-01',b=y+'-12-31',st=calc(a,b),pv=calc((y-1)+'-01-01',(y-1)+'-12-31'),td=today(),n=diffDays(a,b)+1;
+  const y=+UI.date.slice(0,4),a=y+'-01-01',b=y+'-12-31',st=calc(a,b),pv=calcPrev('year',a,b),td=today(),n=diffDays(a,b)+1;
   const start=mondayOf(a);let cells='',d=start,lastM=-1;
   while(d<=b){// 每周一列：首格为月份标签
     const first=d;let lab='';for(let i=0;i<7;i++){const x=addDays(first,i);if(x>=a&&x<=b&&parse(x).getDate()<=7&&parse(x).getMonth()!==lastM){lastM=parse(x).getMonth();lab=(lastM+1)+'月';break}}
@@ -842,7 +883,7 @@ function projCard(p){
       body=`<form class="row" data-sub="qLog" data-p="${p.id}"><label class="f">日期<input class="inp sm" type="date" name="d" value="${today()}" required></label><label class="f">完成数量（${esc(p.unit||'')}）<input class="inp sm num" type="number" name="n" min="0.01" step="any" required style="width:120px"></label><button class="btn sm pri" style="align-self:flex-end">记录进度</button></form>
       <div class="logs">${logs.map(l=>`<span>${l.d.slice(5)} +${l.n}<button class="x" data-act="qDel" data-p="${p.id}" data-i="${l.i}" aria-label="删除这条记录">×</button></span>`).join('')||'<span class="muted" style="background:none;padding:0">还没有记录。</span>'}</div>`;
     }
-    body=`<div class="proj-b"><div>${spark(p,c)}</div><p class="small" style="margin:0">${forecastTxt(p,c)}${c.invested?` 关联事项累计投入 ${fmtMin(c.invested)}。`:''}</p>${p.note?`<p class="small muted" style="margin:0">${esc(p.note)}</p>`:''}${body}
+    body=`<div class="proj-b"><div>${spark(p,c)}</div><p class="small" style="margin:0">${esc(forecastTxt(p,c))}${c.invested?` 关联事项累计投入 ${fmtMin(c.invested)}。`:''}</p>${p.note?`<p class="small muted" style="margin:0">${esc(p.note)}</p>`:''}${body}
       <div class="row" style="justify-content:flex-end"><button class="btn sm ghost" data-act="pEdit" data-id="${p.id}">编辑项目</button><button class="btn sm ghost" data-act="pArch" data-id="${p.id}">${p.arch?'取消归档':'归档'}</button><button class="btn sm ghost danger" data-act="pDel" data-id="${p.id}">删除</button></div></div>`;
   }
   return `<article class="proj"><button class="proj-h" data-act="pOpen" data-id="${p.id}" aria-expanded="${open}">
@@ -870,6 +911,7 @@ function vPrefs(){
   <section class="card"><h2>例行事项 <small>到了指定星期自动出现在待做里，可以带提醒时间</small></h2>${(m.routines||[]).map(r=>`<div class="tagedit"><i class="dot" style="background:${tagColor(r.g)}"></i><span>${esc(r.t)} <span class="muted small">${r.rm?'提醒 '+r.rm+' · ':''}${r.plan?fmtMin(r.plan)+' · ':''}${r.days.length===7?'每天':'周'+[1,2,3,4,5,6,0].filter(d=>r.days.includes(d)).map(d=>WD[d]).join('、')}</span></span><button class="x" data-act="rDel" data-id="${r.id}" aria-label="删除例行事项">×</button></div>`).join('')||'<p class="empty" style="padding:0 0 8px">比如每天背单词、每周三组会。</p>'}
     <form data-sub="rAdd" class="row" style="margin-top:8px"><input class="inp sm grow" name="t" placeholder="事项名称" aria-label="例行事项名称" required><select class="inp sm" name="g" style="width:auto" aria-label="标签">${tsel('')}</select><input class="inp sm num" name="plan" type="number" min="0" placeholder="分钟" style="width:80px" aria-label="预计分钟"><input class="inp sm" name="rm" type="time" style="width:auto" aria-label="提醒时间" title="提醒时间（可不填）">
       <span class="chips">${[1,2,3,4,5,6,0].map(d=>`<label class="chip"><input type="checkbox" name="d" value="${d}" checked style="margin:0">${WD[d]}</label>`).join('')}</span><button class="btn sm">添加</button></form></section>
+  ${appPrefs()}
   ${remindPrefs()}
   ${moneyPrefs()}
   <section class="card"><h2>数据</h2><div class="row"><button class="btn sm" data-act="backup">导出备份（JSON）</button><label class="btn sm" style="cursor:pointer">导入备份并合并<input type="file" accept="application/json,.json" data-chg="restore" hidden></label>${m.demo?`<button class="btn sm" data-act="demoClear">清除示例数据</button>`:`<button class="btn sm" data-act="demoLoad">载入示例数据</button>`}</div></section>`;
@@ -891,12 +933,12 @@ function authErr(e){const m=(e&&e.message)||'';
 function authMsg(t,ok){UI.auth.msg=t;UI.auth.ok=!!ok;const el=$('#auth-msg');if(el){el.textContent=t;el.className='msg '+(ok?'ok':'err')}}
 function vAuth(){
   const a=UI.auth;
-  return `<div class="wrap"><section class="card auth"><div class="brand" style="padding:0"><span class="seal">${SEASON_CN[document.documentElement.dataset.season]}</span><b>四季手账</b></div>
+  return `<div class="wrap"><section class="card auth"><div class="brand" style="padding:0"><img class="logo" src="${APP_ICON}" alt="" style="width:52px;height:52px"><b>四季手账</b></div>
   <p class="muted" style="margin:0">登录后数据保存在云端，换手机、平板或电脑登录同一个账号就能接着用。</p>
   <span class="seg" role="group" aria-label="登录方式" style="align-self:flex-start"><button data-act="authTab" data-k="pw" aria-pressed="${a.tab==='pw'}">邮箱 + 密码</button><button data-act="authTab" data-k="otp" aria-pressed="${a.tab==='otp'}">邮箱验证码</button></span>
   ${a.tab==='pw'?`<form data-sub="authPw"><label class="f">邮箱<input class="inp" type="email" name="email" id="au-email" autocomplete="email" value="${esc(a.email)}" required></label>
     <label class="f">密码<input class="inp" type="password" name="pw" id="au-pw" autocomplete="current-password" minlength="6" required></label>
-    <div class="row"><button class="btn pri grow">登录</button><button type="button" class="btn grow" data-act="authSignUp">注册新账号</button></div></form>`
+    <div class="row"><button class="btn pri grow">登录</button><button type="button" class="btn grow" data-act="authSignUp">注册新账号</button></div><span class="small muted">忘记密码？切到「邮箱验证码」登录，再到设置里重设密码。</span></form>`
   :`<form data-sub="${a.sent?'authVerify':'authSend'}"><label class="f">邮箱<input class="inp" type="email" name="email" id="au-email" autocomplete="email" value="${esc(a.email)}" required ${a.sent?'readonly':''}></label>
     ${a.sent?`<label class="f">邮件里的验证码<input class="inp num" name="code" id="au-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" maxlength="10" placeholder="输入邮件中的数字验证码" required></label>`:''}
     <div class="row"><button class="btn pri grow">${a.sent?'验证并登录':'发送验证码'}</button>${a.sent?'<button type="button" class="btn" data-act="authResend">重新发送</button>':''}</div>
@@ -940,7 +982,7 @@ function editModal(t){
     <div class="row"><label class="f grow">标签<select class="inp" name="g"><option value="">未分类</option>${S.meta.tags.map(x=>`<option value="${x.id}" ${t.g===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
       <label class="f grow">日期<input class="inp" type="date" name="d" value="${t.d}" required></label></div>
     <div class="row"><label class="f grow">预计时长（分钟）<input class="inp num" type="number" min="0" name="plan" value="${t.plan||''}"></label>
-      <label class="f grow">提醒时间<input class="inp" type="time" name="rm" value="${t.rm||''}"></label>
+      <label class="f grow">提醒时间<input class="inp" type="time" name="rm" value="${esc(t.rm||'')}"></label>
       <label class="f grow">关联项目<select class="inp" name="pid"><option value="">不关联</option>${ps.map(p=>`<option value="${p.id}" ${t.pid===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></label></div>
     <div class="row" style="gap:8px 20px"><label class="row" style="gap:8px"><input type="checkbox" name="done" ${t.done?'checked':''}> 已完成</label><label class="row" style="gap:8px"><input type="checkbox" name="star" ${t.star?'checked':''}> ★ 当天最重要的事（日历里排最前）</label></div>
     <div><div class="sec-h" style="margin-bottom:6px">用时记录 <small>开始时间可留空，只记时长</small></div><div id="logrows" style="display:flex;flex-direction:column;gap:6px">${(t.logs||[]).map(l=>logRow(l,t.d)).join('')}</div><button type="button" class="btn sm" data-act="logAdd" style="margin-top:8px">添加一段</button></div>
@@ -971,14 +1013,14 @@ const findG=el=>{const p=findP(el);if(!p)return{};const s=(p.stages||[]).find(x=
 const ACT={
   authTab(el){UI.auth.tab=el.dataset.k;UI.auth.sent=false;UI.auth.msg='';const e=$('#au-email');if(e)UI.auth.email=e.value.trim();render(true)},
   async authSignUp(el){const f=el.closest('form'),email=f.elements.email.value.trim(),pw=f.elements.pw.value;UI.auth.email=email;if(!email||pw.length<6){authMsg('请填写邮箱和至少 6 位的密码');return}el.disabled=true;
-    try{const{data,error}=await Store.sb.auth.signUp({email,password:pw});if(error)throw error;
+    try{const{data,error}=await Store.sb.auth.signUp({email,password:pw,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
       if(data.session){if(Store.mode!=='cloud')signedIn(data.session);return}
       if(data.user&&data.user.identities&&!data.user.identities.length)authMsg('这个邮箱已注册，直接登录即可');else authMsg('注册成功。请到邮箱点一下确认链接，再回来登录；也可以改用「邮箱验证码」直接登录。',true)}
     catch(e){authMsg(authErr(e))}el.disabled=false},
   authResend(){UI.auth.sent=false;UI.auth.msg='';render(true)},
   authSkip(){try{localStorage.setItem('sjsz:skip','1')}catch(e){}enterLocal()},
   authOpen(){try{localStorage.removeItem('sjsz:skip')}catch(e){}if(Store.sb)showAuth();else location.reload()},
-  async signOut(el){el.disabled=true;try{await Store.sb.auth.signOut()}catch(e){}location.reload()},
+  async signOut(el){el.disabled=true;saveLocalNow();try{await Store.sb.auth.signOut()}catch(e){}try{localStorage.removeItem('sjsz:last')}catch(e){}location.reload()},
   picOpen(el){const p=findPic(el.dataset.id);if(!p)return;openModal(`<h2>${mdCN(p.d)} 的照片<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2><div class="ph big"><img data-pic="${p.id}" ${Pics.ready[p.id]?`src="${Pics.ready[p.id]}"`:''} alt="${mdCN(p.d)} 的照片"></div><div class="foot"><button class="btn ghost danger" data-act="picDel" data-id="${p.id}">删除照片</button><span class="sp"></span><button class="btn" data-act="close">关闭</button></div>`,true);hydratePics(modal)},
   picDel(el){if(!armed(el))return;const p=findPic(el.dataset.id);if(!p)return;const M=month(ymOf(p.d),1);M.pics[p.id]={id:p.id,d:p.d,del:1,u:Date.now()};if(Store.pics)Store.pics.del(p).catch(()=>{});delete Pics.ready[p.id];closeModal();commit('m-'+ymOf(p.d))},
   nav(el){const n=+el.dataset.n,k=UI.view==='money'?'month':UI.view==='report'?UI.rep:UI.view;UI.date=n===0?today():shift(k,UI.date,n);render(true);main.scrollTop=0},
@@ -1090,7 +1132,7 @@ const CHG={
   },
   gPct(el){const{p,g}=findG(el);if(!g)return;g.pct=+el.value;g.at=g.pct>=100?Date.now():0;recordHist(p);commit('p-'+p.id)},
   tagName(el){const t=tagOf(el.dataset.id),n=el.value.trim();if(!t||!n){el.value=t?t.name:'';return}t.name=n;commit('meta')},
-  restore(el){const file=el.files&&el.files[0];if(!file)return;const fr=new FileReader();fr.onload=()=>{try{const o=JSON.parse(fr.result);if(!o||typeof o.months!=='object')throw 0;const docs=['meta'];if(o.meta&&Array.isArray(o.meta.tags)){const have=new Set(S.meta.tags.map(t=>t.id));for(const t of o.meta.tags)if(!have.has(t.id))S.meta.tags.push(t);const hr=new Set((S.meta.routines||[]).map(r=>r.id));for(const r of o.meta.routines||[])if(!hr.has(r.id))S.meta.routines.push(r)}
+  restore(el){const file=el.files&&el.files[0];if(!file)return;const fr=new FileReader();fr.onload=()=>{try{const o=JSON.parse(fr.result);if(!o||typeof o.months!=='object')throw 0;cleanImport(o);const docs=['meta'];if(o.meta&&Array.isArray(o.meta.tags)){const have=new Set(S.meta.tags.map(t=>t.id));for(const t of o.meta.tags)if(!have.has(t.id))S.meta.tags.push(t);const hr=new Set((S.meta.routines||[]).map(r=>r.id));for(const r of o.meta.routines||[])if(!hr.has(r.id))S.meta.routines.push(r);const hc=new Set((S.meta.cats||[]).map(c=>c.id));for(const c of o.meta.cats||[])if(!hc.has(c.id))S.meta.cats.push(c)}
       for(const ym in o.months){if(!/^\d{4}-\d{2}$/.test(ym))continue;S.months[ym]=mergeMonth(month(ym,1),o.months[ym]);docs.push('m-'+ym)}for(const id in o.projects||{}){const a=S.projects[id],b=o.projects[id];if(!a||(b.u||0)>(a.u||0)){S.projects[id]=b;docs.push('p-'+id)}}commit(...docs);toast('备份已合并进来')}catch(e){toast('这个文件不是四季手账的备份')}};fr.readAsText(file)},
 };
 const INP={
@@ -1292,7 +1334,7 @@ function fmtY(n){const neg=n<0;n=Math.abs(Math.round((n||0)*100)/100);return(neg
 function addBill(o){const now=Date.now(),b={id:uid(),d:o.d,k:o.k==='in'?'in':'out',amt:o.amt,cat:o.cat||'',note:o.note||'',c:now,u:now};month(ymOf(b.d),1).bills[b.id]=b;return b}
 function dayBills(d){const M=S.months[ymOf(d)];if(!M||!M.bills)return[];return Object.values(M.bills).filter(b=>!b.del&&b.d===d).sort((a,b)=>(a.c||0)-(b.c||0))}
 function calcMoney(from,to){const r={out:0,inc:0,byCat:{},byDay:{},list:[]};for(const ym of monthsBetween(from,to)){const M=S.months[ym];if(!M||!M.bills)continue;for(const id in M.bills){const b=M.bills[id];if(b.del||b.d<from||b.d>to)continue;r.list.push(b);if(b.k==='in')r.inc+=b.amt;else{r.out+=b.amt;r.byCat[b.cat]=(r.byCat[b.cat]||0)+b.amt;r.byDay[b.d]=(r.byDay[b.d]||0)+b.amt}}}return r}
-function billRow(b){return `<div class="bill"><i class="dot" style="background:${catColor(b.cat)}"></i><span class="nm">${esc(catName(b.cat))}${b.note?` <span class="muted">${esc(b.note)}</span>`:''}</span><b class="num ${b.k==='in'?'in':''}">${b.k==='in'?'+':'−'}${fmtY(b.amt)}</b><button class="x" data-act="billDel" data-d="${b.d}" data-id="${b.id}" aria-label="删除这一笔">×</button></div>`}
+function billRow(b){return `<div class="bill"><i class="dot" style="background:${catColor(b.cat)}"></i><button class="nm" data-act="billEdit" data-d="${b.d}" data-id="${b.id}" data-tip="点按修改">${esc(catName(b.cat))}${b.note?` <span class="muted">${esc(b.note)}</span>`:''}</button><b class="num ${b.k==='in'?'in':''}">${b.k==='in'?'+':'−'}${fmtY(b.amt)}</b><button class="x" data-act="billDel" data-d="${b.d}" data-id="${b.id}" aria-label="删除这一笔">×</button></div>`}
 function moneyForm(date,withDate){
   const k=UI.mk,cats=(S.meta.cats||[]).filter(c=>c.k===k);if(!cats.some(c=>c.id===UI.mcat))UI.mcat=cats[0]?cats[0].id:'';
   return `<form class="qa" data-sub="billAdd"><div class="row"><span class="seg" role="group" aria-label="收支类型"><button type="button" data-act="mKind" data-k="out" aria-pressed="${k==='out'}">支出</button><button type="button" data-act="mKind" data-k="in" aria-pressed="${k==='in'}">收入</button></span>
@@ -1306,8 +1348,8 @@ function keepBill(fn){const f=$('form[data-sub=billAdd]'),v=f?{amt:f.elements.am
 function moneyDayCard(d){const bs=dayBills(d),out=bs.filter(b=>b.k!=='in').reduce((a,b)=>a+b.amt,0),inc=bs.filter(b=>b.k==='in').reduce((a,b)=>a+b.amt,0);
   return `<section class="card"><h2>当日收支 <small>支出 ${fmtY(out)}${inc?' · 收入 '+fmtY(inc):''}</small><span class="sp" style="flex:1"></span><a class="lnk small" href="#money">本月账本</a></h2>${moneyForm(d,false)}${bs.length?`<div style="margin-top:10px">${bs.map(billRow).join('')}</div>`:''}</section>`}
 function vMoney(){
-  const[a,b]=rangeOf('month',UI.date),mo=calcMoney(a,b),pm=calcMoney(...rangeOf('month',shift('month',a,-1))),td=today(),n=diffDays(a,b)+1,passed=b<td?n:a>td?0:diffDays(a,td)+1,bud=+S.meta.budget||0,net=mo.inc-mo.out;
-  const dl=pm.out?`<em>比上月${mo.out>=pm.out?'多':'少'} ${Math.abs(Math.round((mo.out-pm.out)/pm.out*100))}%</em>`:'<em>上月无记录</em>';
+  const[a,b]=rangeOf('month',UI.date),mo=calcMoney(a,b),pm=calcMoney(...prevSame('month',a,b)),td=today(),n=diffDays(a,b)+1,passed=b<td?n:a>td?0:diffDays(a,td)+1,bud=+S.meta.budget||0,net=mo.inc-mo.out;
+  const dl=pm.out?`<em>比上月同期${mo.out>=pm.out?'多':'少'} ${Math.abs(Math.round((mo.out-pm.out)/pm.out*100))}%</em>`:'<em>上月同期无记录</em>';
   const k4=bud?`<div class="kpi"><span>预算剩余</span><b>${fmtY(bud-mo.out)}</b><div class="meter"><i style="width:${Math.min(100,mo.out/bud*100)}%;${mo.out>bud?'background:var(--bad)':''}"></i></div><em>预算 ${fmtY(bud)}${passed<n&&bud>mo.out?`，之后日均可花 ${fmtY((bud-mo.out)/(n-passed))}`:''}</em></div>`:`<div class="kpi"><span>日均支出</span><b>${fmtY(passed?mo.out/passed:0)}</b><em>在「设置」里可以设月预算</em></div>`;
   const cs=Object.entries(mo.byCat).sort((p,q)=>q[1]-p[1]),mx=cs.length?cs[0][1]:1;
   const catHtml=cs.length?cs.map(([id,v])=>`<div class="tagrow"><span class="nm"><i class="dot" style="background:${catColor(id)}"></i>${esc(catName(id))}</span><span class="bar"><i style="width:${v/mx*100}%;background:${catColor(id)}"></i></span><span class="v">${fmtY(v)}</span><span class="p">${Math.round(v/mo.out*100)}%</span></div>`).join(''):'<p class="empty">这个月还没有支出记录。</p>';
@@ -1347,7 +1389,7 @@ const Remind={day:'',seen:{},snooze:{},active:[],html:'',
   tick(){if(Store.mode!=='cloud'&&Store.mode!=='local')return;this.load();const now=hm(Date.now()),ts=Date.now(),due=this.list().filter(x=>x.time<=now&&this.seen[x.k]!==2&&!(this.snooze[x.k]>ts));let fresh=false;
     for(const x of due)if(!this.seen[x.k]){this.seen[x.k]=1;delete this.snooze[x.k];fresh=true;const late=hmMin(now)-hmMin(x.time);if(late<=30&&S.meta.rmSnd!==false)beep();sysNotify('四季手账 · '+x.time,x.title+(x.sub?'\n'+x.sub:''),x.k)}
     if(fresh)this.save();this.active=due;this.render()},
-  render(){const bar=$('#remindbar'),n=this.active.length;const html=this.active.map(x=>`<div class="rm-row"><b class="num">${x.time}</b><span class="g">${esc(x.title)}${x.sub?`<small>${esc(x.sub)}</small>`:''}</span><button class="btn sm pri" data-act="rmDone" data-k="${esc(x.k)}">${x.kind==='task'?'完成':x.kind==='proj'?'去记录':'查看'}</button><button class="btn sm" data-act="rmSnooze" data-k="${esc(x.k)}">10 分钟后</button><button class="btn sm ghost" data-act="rmOk" data-k="${esc(x.k)}">知道了</button></div>`).join('');
+  render(){const bar=$('#remindbar'),n=this.active.length;const html=this.active.map(x=>`<div class="rm-row"><b class="num">${esc(x.time)}</b><span class="g">${esc(x.title)}${x.sub?`<small>${esc(x.sub)}</small>`:''}</span><button class="btn sm pri" data-act="rmDone" data-k="${esc(x.k)}">${x.kind==='task'?'完成':x.kind==='proj'?'去记录':'查看'}</button><button class="btn sm" data-act="rmSnooze" data-k="${esc(x.k)}">10 分钟后</button><button class="btn sm ghost" data-act="rmOk" data-k="${esc(x.k)}">知道了</button></div>`).join('');
     if(html!==this.html){this.html=html;bar.innerHTML=html;bar.hidden=!n}
     const tt=(n?`(${n}) `:'')+'四季手账';if(document.title!==tt)document.title=tt},
   find(k){return this.active.find(x=>x.k===k)}
@@ -1524,6 +1566,68 @@ Object.assign(INP,{
 });
 
 function webSave(name,blob){try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('已开始下载')}catch(e){toast('保存没有成功，可以长按或右键图片保存')}}
+
+/* ========== 图标 / 安装为 App / 健壮性 ========== */
+const APP_ICON='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPjxkZWZzPjxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSI1MCUiIGN5PSIzMCUiIHI9Ijg1JSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZGRkZGIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iI0VFRjVGRiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0M3RDhGNCIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJnMSIgY3g9IjM2JSIgY3k9IjI4JSIgcj0iODAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNFNEZGQjAiLz48c3RvcCBvZmZzZXQ9Ii40MiIgc3RvcC1jb2xvcj0iIzdCREQ0NSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFGOUU0MyIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJnMiIgY3g9IjM2JSIgY3k9IjI4JSIgcj0iODAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNDOUYzRkYiLz48c3RvcCBvZmZzZXQ9Ii40MiIgc3RvcC1jb2xvcj0iIzQ4QkVGRiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzE2NjhEQyIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJnMyIgY3g9IjM2JSIgY3k9IjI4JSIgcj0iODAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkU5QTgiLz48c3RvcCBvZmZzZXQ9Ii40MiIgc3RvcC1jb2xvcj0iI0ZGQTYzRCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0VFNUExNCIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJnNCIgY3g9IjM2JSIgY3k9IjI4JSIgcj0iODAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkQ5RUMiLz48c3RvcCBvZmZzZXQ9Ii40MiIgc3RvcC1jb2xvcj0iI0ZGN0ZCMiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0Q0MkY3NCIvPjwvcmFkaWFsR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJobCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZiIgc3RvcC1vcGFjaXR5PSIuOTUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZmYiIHN0b3Atb3BhY2l0eT0iMCIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iYmx1ciIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMjYiLz48L2ZpbHRlcj48ZmlsdGVyIGlkPSJzb2Z0IiB4PSItMzAlIiB5PSItMzAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIxNjAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI3Ii8+PC9maWx0ZXI+PGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTYiIHJlc3VsdD0iYiIvPjxmZU1lcmdlPjxmZU1lcmdlTm9kZSBpbj0iYiIvPjxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPjwvZmVNZXJnZT48L2ZpbHRlcj48Y2xpcFBhdGggaWQ9ImNTIj48Y2lyY2xlIGN4PSI1MTIiIGN5PSI2ODYiIHI9IjIyMiIvPjwvY2xpcFBhdGg+PGNsaXBQYXRoIGlkPSJzcSI+PHBhdGggZD0iTTUxMiwwIEM4ODAsMCAxMDI0LDE0NCAxMDI0LDUxMiBDMTAyNCw4ODAgODgwLDEwMjQgNTEyLDEwMjQgQzE0NCwxMDI0IDAsODgwIDAsNTEyIEMwLDE0NCAxNDQsMCA1MTIsMCBaIi8+PC9jbGlwUGF0aD48L2RlZnM+PGcgY2xpcC1wYXRoPSJ1cmwoI3NxKSI+PHJlY3Qgd2lkdGg9IjEwMjQiIGhlaWdodD0iMTAyNCIgZmlsbD0idXJsKCNiZykiLz48ZWxsaXBzZSBjeD0iNTEyIiBjeT0iMTUwIiByeD0iNTIwIiByeT0iMjEwIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuNTUiIGZpbHRlcj0idXJsKCNibHVyKSIvPjxnIGZpbHRlcj0idXJsKCNibHVyKSIgb3BhY2l0eT0iLjQyIj48Y2lyY2xlIGN4PSI1MTIiIGN5PSIzNjgiIHI9IjIwNCIgZmlsbD0idXJsKCNnMSkiLz48Y2lyY2xlIGN4PSI2ODYiIGN5PSI1NDIiIHI9IjIwNCIgZmlsbD0idXJsKCNnMikiLz48Y2lyY2xlIGN4PSI1MTIiIGN5PSI3MTYiIHI9IjIwNCIgZmlsbD0idXJsKCNnMykiLz48Y2lyY2xlIGN4PSIzMzgiIGN5PSI1NDIiIHI9IjIwNCIgZmlsbD0idXJsKCNnNCkiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzM4LDUxMikiPjxjaXJjbGUgcj0iMjIyIiBmaWxsPSJ1cmwoI2c0KSIgZmlsbC1vcGFjaXR5PSIwLjc0Ii8+PGNpcmNsZSByPSIyMTciIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii41NSIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGVsbGlwc2UgY3g9Ii01NiIgY3k9Ii0xMTIiIHJ4PSIxMTQiIHJ5PSI2MiIgZmlsbD0idXJsKCNobCkiIHRyYW5zZm9ybT0icm90YXRlKC0yNCkiLz48cGF0aCBkPSJNLTE1MCwxMjAgQTIwMCwyMDAgMCAwIDAgMTUwLDEyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iLjM1IiBzdHJva2Utd2lkdGg9IjE0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbHRlcj0idXJsKCNzb2Z0KSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1MTIsMzM4KSI+PGNpcmNsZSByPSIyMjIiIGZpbGw9InVybCgjZzEpIiBmaWxsLW9wYWNpdHk9IjAuNzQiLz48Y2lyY2xlIHI9IjIxNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iLjU1IiBzdHJva2Utd2lkdGg9IjUiLz48ZWxsaXBzZSBjeD0iLTU2IiBjeT0iLTExMiIgcng9IjExNCIgcnk9IjYyIiBmaWxsPSJ1cmwoI2hsKSIgdHJhbnNmb3JtPSJyb3RhdGUoLTI0KSIvPjxwYXRoIGQ9Ik0tMTUwLDEyMCBBMjAwLDIwMCAwIDAgMCAxNTAsMTIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIuMzUiIHN0cm9rZS13aWR0aD0iMTQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsdGVyPSJ1cmwoI3NvZnQpIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDY4Niw1MTIpIj48Y2lyY2xlIHI9IjIyMiIgZmlsbD0idXJsKCNnMikiIGZpbGwtb3BhY2l0eT0iMC43NCIvPjxjaXJjbGUgcj0iMjE3IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIuNTUiIHN0cm9rZS13aWR0aD0iNSIvPjxlbGxpcHNlIGN4PSItNTYiIGN5PSItMTEyIiByeD0iMTE0IiByeT0iNjIiIGZpbGw9InVybCgjaGwpIiB0cmFuc2Zvcm09InJvdGF0ZSgtMjQpIi8+PHBhdGggZD0iTS0xNTAsMTIwIEEyMDAsMjAwIDAgMCAwIDE1MCwxMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4zNSIgc3Ryb2tlLXdpZHRoPSIxNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWx0ZXI9InVybCgjc29mdCkiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNTEyLDY4NikiPjxjaXJjbGUgcj0iMjIyIiBmaWxsPSJ1cmwoI2czKSIgZmlsbC1vcGFjaXR5PSIwLjc0Ii8+PGNpcmNsZSByPSIyMTciIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii41NSIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGVsbGlwc2UgY3g9Ii01NiIgY3k9Ii0xMTIiIHJ4PSIxMTQiIHJ5PSI2MiIgZmlsbD0idXJsKCNobCkiIHRyYW5zZm9ybT0icm90YXRlKC0yNCkiLz48cGF0aCBkPSJNLTE1MCwxMjAgQTIwMCwyMDAgMCAwIDAgMTUwLDEyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iLjM1IiBzdHJva2Utd2lkdGg9IjE0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbHRlcj0idXJsKCNzb2Z0KSIvPjwvZz48ZyBjbGlwLXBhdGg9InVybCgjY1MpIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMzgsNTEyKSI+PGNpcmNsZSByPSIyMjIiIGZpbGw9InVybCgjZzQpIiBmaWxsLW9wYWNpdHk9IjAuNzQiLz48Y2lyY2xlIHI9IjIxNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iLjU1IiBzdHJva2Utd2lkdGg9IjUiLz48L2c+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDUxMiw1MTIpIiBmaWx0ZXI9InVybCgjZ2xvdykiPjxwYXRoIGQ9Ik0wLC0xMjYgQzExLjM0LC0zMi43NiAzMi43NiwtMTEuMzQgMTI2LDAgQzMyLjc2LDExLjM0IDExLjM0LDMyLjc2IDAsMTI2IEMtMTEuMzQsMzIuNzYgLTMyLjc2LDExLjM0IC0xMjYsMCBDLTMyLjc2LC0xMS4zNCAtMTEuMzQsLTMyLjc2IDAsLTEyNiBaIiBmaWxsPSIjZmZmIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDgzOCwxOTYpIiBmaWx0ZXI9InVybCgjc29mdCkiPjxwYXRoIGQ9Ik0wLC00NiBDNC4xNCwtMTEuOTYgMTEuOTYsLTQuMTQgNDYsMCBDMTEuOTYsNC4xNCA0LjE0LDExLjk2IDAsNDYgQy00LjE0LDExLjk2IC0xMS45Niw0LjE0IC00NiwwIEMtMTEuOTYsLTQuMTQgLTQuMTQsLTExLjk2IDAsLTQ2IFoiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii45Ii8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDgzOCwxOTYpIj48cGF0aCBkPSJNMCwtNDYgQzQuMTQsLTExLjk2IDExLjk2LC00LjE0IDQ2LDAgQzExLjk2LDQuMTQgNC4xNCwxMS45NiAwLDQ2IEMtNC4xNCwxMS45NiAtMTEuOTYsNC4xNCAtNDYsMCBDLTExLjk2LC00LjE0IC00LjE0LC0xMS45NiAwLC00NiBaIiBmaWxsPSIjZmZmIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE3Niw4NDYpIj48cGF0aCBkPSJNMCwtMzAgQzIuNjk5OTk5OTk5OTk5OTk5NywtNy44MDAwMDAwMDAwMDAwMDEgNy44MDAwMDAwMDAwMDAwMDEsLTIuNjk5OTk5OTk5OTk5OTk5NyAzMCwwIEM3LjgwMDAwMDAwMDAwMDAwMSwyLjY5OTk5OTk5OTk5OTk5OTcgMi42OTk5OTk5OTk5OTk5OTk3LDcuODAwMDAwMDAwMDAwMDAxIDAsMzAgQy0yLjY5OTk5OTk5OTk5OTk5OTcsNy44MDAwMDAwMDAwMDAwMDEgLTcuODAwMDAwMDAwMDAwMDAxLDIuNjk5OTk5OTk5OTk5OTk5NyAtMzAsMCBDLTcuODAwMDAwMDAwMDAwMDAxLC0yLjY5OTk5OTk5OTk5OTk5OTcgLTIuNjk5OTk5OTk5OTk5OTk5NywtNy44MDAwMDAwMDAwMDAwMDEgMCwtMzAgWiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjk1Ii8+PC9nPjwvZz48L3N2Zz4=';
+(function(){const l=document.getElementById('fav');if(l)l.href=APP_ICON})();
+const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();UI.installEvt=e;if(UI.view==='prefs'&&(Store.mode==='cloud'||Store.mode==='local'))render()});
+window.addEventListener('appinstalled',()=>{UI.installEvt=null;toast('已安装，可以从桌面或开始菜单打开')});
+function pwaSetup(){
+  if(Store.host!=='web'||!/^https?:$/.test(location.protocol))return;
+  try{const add=(rel,href)=>{const l=document.createElement('link');l.rel=rel;l.href=href;document.head.appendChild(l)};add('manifest','manifest.webmanifest');add('apple-touch-icon','icons/apple-touch-icon.png');
+    if('serviceWorker'in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+}
+function appPrefs(){
+  if(Store.host!=='web')return'';
+  return `<section class="card"><h2>安装为 App</h2>${isStandalone()?'<p style="margin:0">现在就是以 App 方式运行的，数据和网页版完全相同。</p>':`<p style="margin:0 0 10px">这个网站可以直接装成 App：有自己的图标和独立窗口，没网时也能打开，数据和网页版完全相同。</p>
+  ${UI.installEvt?'<div class="row" style="margin-bottom:10px"><button class="btn sm pri" data-act="pwaInstall">安装到这台设备</button></div>':''}
+  <ul class="small muted" style="display:flex;flex-direction:column;gap:4px"><li>iPhone / iPad：用 Safari 打开本页 → 点分享按钮 → 添加到主屏幕</li><li>Windows：用 Edge 或 Chrome 打开本页 → 点地址栏右侧的安装图标（或菜单 → 应用 → 将此站点作为应用安装）</li><li>Android：用 Chrome 打开本页 → 菜单 → 安装应用 / 添加到主屏幕</li></ul>`}</section>`;
+}
+function saveLocalNow(){clearTimeout(lsT);try{if(Store.mode==='cloud'||Store.mode==='local')localStorage.setItem(Store.lkey,JSON.stringify({S,known:[...Store.known],dirty:[...Store.dirty],seenU:Store.seenU||{}}))}catch(e){}}
+addEventListener('pagehide',saveLocalNow);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveLocalNow()});
+function mergeMeta(L,R){const newer=(R.u||0)>(L.u||0),A=newer?R:L,B=newer?L:R,out={...B,...A};
+  for(const f of['tags','cats','routines']){const a=Array.isArray(A[f])?A[f]:[],ids=new Set(a.map(x=>x.id));out[f]=a.concat((Array.isArray(B[f])?B[f]:[]).filter(x=>!ids.has(x.id)))}
+  const rp={...(B.reports||{})};for(const k in A.reports||{}){const x=A.reports[k],y=rp[k];rp[k]=!y||(x.u||0)>=(y.u||0)?x:y}out.reports=rp;out.u=Math.max(L.u||0,R.u||0);return out}
+function cleanImport(o){
+  const ok=s=>typeof s==='string'&&/^[\w:.\-]{1,80}$/.test(s),isD=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s),isT=s=>typeof s==='string'&&/^\d\d:\d\d$/.test(s),col=x=>{x.c=Math.min(8,Math.max(1,parseInt(x.c)||1))};
+  if(o.meta&&typeof o.meta==='object'){for(const f of['tags','cats','routines'])o.meta[f]=Array.isArray(o.meta[f])?o.meta[f].filter(x=>x&&ok(x.id)):[];o.meta.tags.forEach(col);o.meta.cats.forEach(c=>{col(c);c.k=c.k==='in'?'in':'out'});o.meta.routines=o.meta.routines.filter(r=>Array.isArray(r.days));for(const r of o.meta.routines){if(r.rm&&!isT(r.rm))r.rm='';if(r.g&&!ok(r.g))r.g=''}}
+  for(const ym in o.months){const M=o.months[ym];if(!M||typeof M!=='object'||!/^\d{4}-\d{2}$/.test(ym)){delete o.months[ym];continue}
+    for(const f of['tasks','pics','bills']){const m=M[f]&&typeof M[f]==='object'?M[f]:{};for(const k in m){const x=m[k];if(!x||!ok(k)||x.id!==k||!isD(x.d)||(x.g&&!ok(x.g))||(x.cat&&!ok(x.cat))||(x.pid&&!ok(x.pid))||(x.rid&&!ok(x.rid))||(x.a&&!ok(x.a))){delete m[k];continue}
+      if(x.rm&&!isT(x.rm))delete x.rm;if(f==='bills'){x.amt=Math.abs(+x.amt)||0;x.k=x.k==='in'?'in':'out'}if(f==='tasks'&&!x.del){x.plan=Math.max(0,+x.plan||0);x.logs=Array.isArray(x.logs)?x.logs.filter(l=>l&&+l.m>0).map(l=>({s:+l.s||null,m:+l.m})):[]}}M[f]=m}}
+  o.projects=o.projects&&typeof o.projects==='object'?o.projects:{};
+  for(const id in o.projects){const p=o.projects[id];if(!p||!ok(id)||p.id!==id){delete o.projects[id];continue}p.kind=p.kind==='qty'?'qty':'ms';if(!isD(p.start))p.start=today();if(p.due&&!isD(p.due))p.due=null;if(p.rm&&!isT(p.rm))p.rm='';
+    if(p.kind==='qty'){p.target=+p.target||0;p.logs=Array.isArray(p.logs)?p.logs.filter(l=>l&&isD(l.d)&&+l.n>0).map(l=>({d:l.d,n:+l.n})):[]}
+    else{p.stages=Array.isArray(p.stages)?p.stages:[];for(const s of p.stages){if(!ok(s.id))s.id=uid();s.goals=Array.isArray(s.goals)?s.goals:[];for(const g of s.goals){if(!ok(g.id))g.id=uid();g.pct=Math.min(100,Math.max(0,+g.pct||0));g.size=[1,2,3].includes(g.size)?g.size:2;if(g.w!=null)g.w=Math.min(10,Math.max(1,+g.w||5))}}
+      const h={};for(const k in p.hist||{})if(isD(k))h[k]=+p.hist[k]||0;p.hist=h}}
+}
+function billModal(b){
+  const opts=k=>(S.meta.cats||[]).filter(c=>c.k===k).map(c=>`<option value="${c.id}" ${b.cat===c.id?'selected':''}>${esc(c.name)}</option>`).join('');
+  openModal(`<h2>修改这一笔<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2>
+  <form data-sub="billSave" data-d="${b.d}" data-id="${b.id}" style="display:flex;flex-direction:column;gap:12px">
+    <div class="row"><label class="f grow">类型<select class="inp" name="k"><option value="out" ${b.k!=='in'?'selected':''}>支出</option><option value="in" ${b.k==='in'?'selected':''}>收入</option></select></label><label class="f grow">金额<input class="inp num" name="amt" inputmode="decimal" value="${b.amt}" required autofocus></label></div>
+    <div class="row"><label class="f grow">分类<select class="inp" name="cat"><optgroup label="支出">${opts('out')}</optgroup><optgroup label="收入">${opts('in')}</optgroup></select></label><label class="f grow">日期<input class="inp" type="date" name="d" value="${b.d}" required></label></div>
+    <label class="f">备注<input class="inp" name="note" value="${esc(b.note||'')}" maxlength="40"></label>
+    <div class="foot"><button type="button" class="btn" data-act="close">取消</button><button class="btn pri">保存</button></div></form>`);
+}
+Object.assign(ACT,{
+  async pwaInstall(){const e=UI.installEvt;if(!e)return;try{e.prompt();await e.userChoice}catch(x){}UI.installEvt=null;render(true)},
+  billEdit(el){const M=month(ymOf(el.dataset.d)),b=M&&M.bills[el.dataset.id];if(b&&!b.del)billModal(b)},
+});
+Object.assign(SUB,{
+  billSave(f){const E=f.elements,M=month(ymOf(f.dataset.d)),b=M&&M.bills[f.dataset.id];if(!b)return closeModal();const amt=Math.round(parseFloat(String(E.amt.value).replace(/[,，\s]/g,''))*100)/100;if(!(amt>0)){toast('请输入大于 0 的金额');E.amt.focus();return}
+    const nd=E.d.value||b.d,docs=new Set(['m-'+ymOf(b.d)]),nb={...b,amt,k:E.k.value==='in'?'in':'out',cat:E.cat.value,note:E.note.value.trim(),d:nd,u:Date.now()};
+    const c=catOf(nb.cat);if(c&&c.k!==nb.k){const first=(S.meta.cats||[]).find(x=>x.k===nb.k);nb.cat=first?first.id:''}
+    if(ymOf(nd)!==ymOf(b.d)){M.bills[b.id]={id:b.id,d:b.d,del:1,u:Date.now()};month(ymOf(nd),1).bills[b.id]=nb;docs.add('m-'+ymOf(nd))}else M.bills[b.id]=nb;
+    closeModal();commit(...docs)},
+});
+UI.today=today();
+/* 进行中的周期只和上一期的同一段天数比，避免月初、周初显示成大幅下降 */
+function prevSame(view,a,b){const td=today(),[pa,pb]=rangeOf(view,shift(view,a,-1));if(td<a||td>b)return[pa,pb];const e=addDays(pa,diffDays(a,td));return[pa,e<pb?e:pb]}
+function calcPrev(view,a,b){return calc(...prevSame(view,a,b))}
+addEventListener('online',()=>{if(Store.mode==='cloud'&&Store.dirty.size){clearTimeout(Store.timer);Store.timer=setTimeout(flush,900)}});
+setInterval(()=>{const t=today();if(t!==UI.today){const old=UI.today;UI.today=t;if(UI.date===old)UI.date=t;if(Store.mode==='cloud'||Store.mode==='local')render()}},20000);
 
 boot();
 </script>
