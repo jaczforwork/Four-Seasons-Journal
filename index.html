@@ -438,6 +438,13 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--in
 .dots button{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:transparent;transition:.12s}
 .dots button:hover{border-color:var(--accent)}
 .dots button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+/* 每日一句、当日提醒、日历上的分数 */
+.quote{margin-top:10px;padding:10px 12px 0;text-align:center;color:var(--ink2);font-size:12px;line-height:1.7;display:flex;flex-direction:column;align-items:center;gap:1px}
+.quote .o{font-family:var(--font-display);font-size:13.5px;color:var(--ink);opacity:.72;max-width:60ch;text-wrap:balance}
+.quote .z{max-width:60ch;text-wrap:balance}
+.quote cite{font-style:normal;font-size:11px;opacity:.8}
+.daytip{font-size:13px;line-height:1.7;margin:12px 0 0;padding:9px 12px;border-radius:10px;background:rgba(var(--accent-rgb),.09)}
+.scb{font-size:10px;font-weight:700;line-height:16px;padding:0 5px;border-radius:99px;background:rgba(var(--accent-rgb),.16);margin-left:5px;font-variant-numeric:tabular-nums;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -1887,6 +1894,149 @@ Object.assign(SUB,{
     const list=focusList().filter(x=>x.id!==f.dataset.id);list.push({id:f.dataset.id||uid(),name,from,to,w,c:Date.now()});S.meta.focus=list.slice(-40);closeModal();commit('meta');toast('已设置阶段重点')},
   dimAdd(f){const n=f.elements.n.value.trim();if(!n)return;const ds=dimsOf().slice();if(ds.some(d=>d.name===n)){toast('已有同名维度');return}if(ds.length>=8){toast('最多 8 个维度');return}ds.push({id:'d'+uid(),name:n});S.meta.dims=ds;commit('meta')},
 });
+
+/* ========== 每日一句：原文 + 中文，放在页面最下方 ========== */
+const QUOTES=[
+['Omnia, Lucili, aliena sunt, tempus tantum nostrum est.','一切都是别人的，唯有时间属于我们。','塞涅卡《道德书简》','la'],
+['千里之行，始于足下。','再远的路，也是从脚下这一步开始的。','《道德经》','zh'],
+['Es ist nicht genug, zu wissen, man muß auch anwenden; es ist nicht genug, zu wollen, man muß auch tun.','光知道是不够的，还必须运用；光有愿望是不够的，还必须行动。','歌德《威廉·麦斯特的漫游时代》','de'],
+['ὁ δὲ ἀνεξέταστος βίος οὐ βιωτὸς ἀνθρώπῳ','未经审视的人生不值得过。','苏格拉底，见柏拉图《申辩篇》','el'],
+['Caminante, no hay camino, se hace camino al andar.','行路的人啊，世上本没有路，路是走出来的。','安东尼奥·马查多《箴言与歌谣》','es'],
+['七転び八起き','跌倒七次，第八次站起来。','日本谚语','ja'],
+['Well done is better than well said.','做得好胜过说得好。','富兰克林《穷理查年鉴》','en'],
+['不积跬步，无以至千里；不积小流，无以成江海。','不一步步地走，到不了千里之外；不汇集细流，成不了江海。','《荀子·劝学》','zh'],
+['Il faut cultiver notre jardin.','我们必须耕种自己的园地。','伏尔泰《老实人》','fr'],
+['Нет сильнее тех двух воинов, терпение и время.','没有比这两位战士更强大的了：耐心和时间。','托尔斯泰《战争与和平》','ru'],
+['Non exiguum temporis habemus, sed multum perdidimus.','我们拥有的时间并不少，只是浪费了太多。','塞涅卡《论生命之短暂》','la'],
+['कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।','你只有行动的权利，而无权索要它的结果。','《薄伽梵歌》2.47','sa'],
+['Chi va piano, va sano e va lontano.','走得慢的人，走得稳，也走得远。','意大利谚语','it'],
+['学而不思则罔，思而不学则殆。','只学不想会迷惑，只想不学会疲惫无成。','《论语·为政》','zh'],
+['Was mich nicht umbringt, macht mich stärker.','凡不能杀死我的，使我更强大。','尼采《偶像的黄昏》','de'],
+['Dimidium facti, qui coepit, habet: sapere aude, incipe.','开了头就做成了一半：敢于求知，开始吧。','贺拉斯《书札》','la'],
+['천 리 길도 한 걸음부터','千里之路，也从一步开始。','朝鲜语谚语','ko'],
+['This above all: to thine own self be true.','最要紧的是：对自己忠实。','莎士比亚《哈姆雷特》','en'],
+['الصبر مفتاح الفرج','耐心是解脱的钥匙。','阿拉伯谚语','ar'],
+['凡事豫则立，不豫则废。','事先有准备就能成，没有准备就会落空。','《礼记·中庸》','zh'],
+['Le cœur a ses raisons que la raison ne connaît point.','心有它的道理，是理性所不知道的。','帕斯卡《思想录》','fr'],
+['Ὁ βίος βραχύς, ἡ δὲ τέχνη μακρή.','生命短暂，技艺长久。','希波克拉底《箴言》','el'],
+['Haba na haba hujaza kibaba.','一点一点，就能装满量杯。','斯瓦希里谚语','sw'],
+['Great works are performed not by strength, but perseverance.','伟大的事业靠的不是力气，而是坚持。','塞缪尔·约翰逊《拉塞拉斯》','en'],
+['継続は力なり','坚持就是力量。','日本格言','ja'],
+['Ignoranti quem portum petat nullus suus ventus est.','不知道要驶向哪个港口的人，什么风都不是顺风。','塞涅卡《道德书简》','la'],
+['天行健，君子以自强不息。','天道运行不止，人也应当奋发不停。','《周易·乾》','zh'],
+['Тише едешь — дальше будешь.','走得慢一点，反而走得更远。','俄罗斯谚语','ru'],
+['Es irrt der Mensch, solang er strebt.','人只要还在努力，就难免会走错。','歌德《浮士德》','de'],
+['אם אין אני לי, מי לי? וכשאני לעצמי, מה אני? ואם לא עכשיו, אימתי?','我不为自己，谁为我？只为自己，我又算什么？此时不做，更待何时？','希勒尔，见《先贤篇》','he'],
+['Rien ne sert de courir ; il faut partir à point.','跑得快没有用，要紧的是及时出发。','拉封丹《龟兔赛跑》','fr'],
+['Damlaya damlaya göl olur.','一滴一滴，就汇成了湖。','土耳其谚语','tr'],
+['To strive, to seek, to find, and not to yield.','去奋斗，去探求，去发现，永不屈服。','丁尼生《尤利西斯》','en'],
+['合抱之木，生于毫末；九层之台，起于累土。','合抱的大树从细芽长起，九层的高台从一筐土垒起。','《道德经》','zh'],
+['Gutta cavat lapidem.','水滴石穿。','奥维德《黑海书简》','la'],
+['Fatti non foste a viver come bruti, ma per seguir virtute e canoscenza.','你们生来不是为了像野兽一样活着，而是为了追求美德与知识。','但丁《神曲·地狱篇》','it'],
+['این نیز بگذرد','这也会过去。','波斯谚语','fa'],
+['Lost time is never found again.','失去的时间再也找不回来。','富兰克林《穷理查年鉴》','en'],
+['Hat man sein warum? des Lebens, so verträgt man sich fast mit jedem wie?','知道自己为什么而活的人，几乎能忍受任何一种活法。','尼采《偶像的黄昏》','de'],
+['知之者不如好之者，好之者不如乐之者。','懂得它不如喜欢它，喜欢它不如以它为乐。','《论语·雍也》','zh'],
+['Plura sunt, Lucili, quae nos terrent quam quae premunt, et saepius opinione quam re laboramus.','吓到我们的事比真正压在身上的事多；我们更常苦于想象，而不是现实。','塞涅卡《道德书简》','la'],
+['Petit à petit, l’oiseau fait son nid.','一点一点，鸟儿筑成了巢。','法国谚语','fr'],
+['Повторение — мать учения.','重复是学习之母。','俄罗斯谚语','ru'],
+['Ἀρχὴ ἥμισυ παντός.','开始是全部的一半。','古希腊谚语','el'],
+['There is nothing either good or bad, but thinking makes it so.','事情本无好坏，是想法使它如此。','莎士比亚《哈姆雷特》','en'],
+['锲而不舍，金石可镂。','只要不停地刻下去，金属和石头也能雕穿。','《荀子·劝学》','zh'],
+['El que lee mucho y anda mucho, ve mucho y sabe mucho.','读得多、走得多的人，见得多，也懂得多。','塞万提斯《堂吉诃德》','es'],
+['Orandum est ut sit mens sana in corpore sano.','应当祈求的是：健全的精神寓于健全的身体。','尤维纳利斯《讽刺诗》','la'],
+['시작이 반이다','开始就是一半。','朝鲜语谚语','ko'],
+['Livet forstås baglæns, men må leves forlæns.','生活只能倒着去理解，却必须向前去过。','克尔凯郭尔（据其日记的通行概括）','da'],
+['知人者智，自知者明。','了解别人是聪明，了解自己才是明白。','《道德经》','zh'],
+['Sapere aude! Habe Mut, dich deines eigenen Verstandes zu bedienen!','敢于求知！要有勇气运用你自己的理智！','康德《什么是启蒙》','de'],
+['Our life is frittered away by detail.','我们的生命被琐碎消磨掉了。','梭罗《瓦尔登湖》','en'],
+['Sed fugit interea, fugit inreparabile tempus.','而时间正在流走，一去不返。','维吉尔《农事诗》','la'],
+['Devagar se vai ao longe.','慢慢走，才走得远。','葡萄牙谚语','pt'],
+['天下难事，必作于易；天下大事，必作于细。','难事要从容易处做起，大事要从细微处做起。','《道德经》','zh'],
+['Краткость — сестра таланта.','简洁是才华的姊妹。','契诃夫，致兄长的信','ru'],
+['Carpe diem, quam minimum credula postero.','抓住今天，尽量少指望明天。','贺拉斯《颂歌》','la'],
+['The art of being wise is the art of knowing what to overlook.','智慧的艺术，就是懂得该忽略什么。','威廉·詹姆斯《心理学原理》','en'],
+['一期一会','这一次相遇，一生只有一回。','日本茶道用语','ja'],
+['逝者如斯夫，不舍昼夜。','时间像这流水一样，日夜不停地过去。','《论语·子罕》','zh'],
+['Audentis Fortuna iuvat.','命运眷顾勇敢的人。','维吉尔《埃涅阿斯纪》','la'],
+['Trust thyself: every heart vibrates to that iron string.','相信你自己：每颗心都随这根铁弦而颤动。','爱默生《论自助》','en'],
+['Poco a poco se va lejos.','一点一点，就能走远。','西班牙谚语','es'],
+];
+function quoteFor(d){const n=QUOTES.length,i=((diffDays('2026-01-01',d)*7)%n+n)%n;return QUOTES[i]}
+function quoteHtml(d){const[o,z,src,lang]=quoteFor(d);return `<footer class="quote"><span class="o" lang="${lang}" dir="auto">${esc(o)}</span><span class="z">${lang==='zh'?'今译：':''}${esc(z)}</span><cite>${esc(src)}</cite></footer>`}
+
+/* ========== 更贴合处境的小提醒 ========== */
+const pickBy=(arr,seed)=>arr[Math.abs(seed)%arr.length];
+function seedOf(s){let h=7;for(const c of String(s))h=(h*31+c.charCodeAt(0))|0;return h}
+function dimKind(n){return /睡/.test(n)?'sleep':/身体|健身|运动|锻炼|健康/.test(n)?'body':/心情|情绪/.test(n)?'mood':/学习|工作|专注|读书/.test(n)?'study':/收支|钱|消费|储蓄|攒/.test(n)?'money':'other'}
+const TIPS={
+ mood:{low:['「{n}」这一期平均 {a} 分，辛苦了。{x}情绪低的时候不用逼自己高效：把清单砍到最要紧的一两件，做完就算赢。低谷会过去，它不代表你做得不好。','「{n}」只有 {a} 分。先说一句：这样的日子里你还在坚持记录，已经很了不起。{x}今天对自己宽一点，出门走十分钟，或者找个人说说话。'],
+       down:['「{n}」后半段在往下掉。看看是不是把自己排得太满了，留一个什么都不安排的晚上给自己。'],
+       high:['「{n}」平均 {a} 分，状态很好。记下是什么让你开心的，下一期多给它留点时间。'],
+       day:['今天心情不太好，没关系。把剩下的事减到一件，做完就收工，早点休息。你已经撑过了今天。','心情低的日子也被你认真过完了。别复盘，别自责，明天是新的一页。']},
+ sleep:{low:['「{n}」平均只有 {a} 分。睡眠不是可以省下来的时间：睡不够，专注、情绪和记忆都会打折，白天多花的时间往往补不回来。这一期先把上床时间固定下来，比任何效率技巧都管用。','「{n}」是最低的一项（{a} 分）。少睡一小时换来的那一小时，质量通常很差。今晚提前半小时放下手机，把睡眠当成明天的第一件正事。'],
+        down:['「{n}」后半段明显变差。睡眠欠的账会利滚利，这两天优先把它补回来，别的事可以往后放。'],
+        high:['「{n}」平均 {a} 分。睡得好是其他一切的底子，保持住。'],
+        day:['昨晚没睡好的话，今天别硬撑：重要的事放在上午，今晚早点躺下。睡眠是明天状态的本钱。','睡眠分偏低。今晚把手机放远一点，比平时早半小时上床。']},
+ body:{low:['「{n}」只有 {a} 分{x}。别等有空，现在就定下一次：换好衣服出门，哪怕只动十五分钟。动起来之后的你，会感谢现在的你。','该动起来了。「{n}」这一项 {a} 分{x}，不需要完美的计划：今天做一组，明天再做一组，力量就是这样一次一次练出来的。你比自己以为的更有劲。'],
+       down:['「{n}」在往下掉。身体是你做所有事的发动机，这周至少给它两次机会，出一身汗再说。'],
+       high:['「{n}」平均 {a} 分{x}，练得漂亮。保持这个节奏，你正在变成更有劲的自己。'],
+       day:['今天身体这项偏低。站起来，活动五分钟，现在就去。先动起来，感觉会跟上。','身体在提醒你了。今天不求多，做十个深蹲或者下楼走一圈，把开关打开。']},
+ study:{low:['「{n}」平均 {a} 分{x}。别跟落下的进度较劲，每天只要求自己先开始 25 分钟。最难的是坐下来的那一下，坐下来就赢了一半。'],
+        down:['「{n}」后半段在下滑。把最难的一块挪到一天里精力最好的时段，其他事围着它排。'],
+        high:['「{n}」平均 {a} 分{x}，投入很稳。照这个节奏走，积累会在某一天突然显出来。'],
+        day:['今天学习这项不理想。现在开一个 25 分钟的计时，只做最小的一步，做完就算数。']},
+ money:{low:['「{n}」只有 {a} 分{x}。钱的事越早看清越轻松：翻一下账本里最大的那个分类，给它定一个每周上限。'],
+        down:['「{n}」在变差。这几天每花一笔就记一笔，看得见，手自然会紧一点。'],
+        high:['「{n}」平均 {a} 分{x}，管得很稳。把省下来的数字记一笔，看着它涨是最好的动力。'],
+        day:['今天收支这项偏低。花了就花了，记下来就好；明天给自己定一个上限。']},
+ other:{low:['「{n}」平均 {a} 分，是偏低的一项。下一期可以把它设为阶段重点，每天为它做一件小事。'],
+        down:['「{n}」后半段比前半段低，留意一下原因。'],
+        high:['「{n}」平均 {a} 分，做得好，继续。'],
+        day:['「{n}」今天偏低，明天给它留一点时间。']}
+};
+function tipText(x,level,seed,extra){const set=(TIPS[dimKind(x.name)]||TIPS.other)[level]||TIPS.other[level];return pickBy(set,seed).replace(/\{n\}/g,x.name).replace(/\{a\}/g,(x.avg||0).toFixed(1)).replace(/\{x\}/g,extra||'')}
+function tagMin(st,re){let m=0;for(const g in st.byTag){const t=tagOf(g);if(t&&re.test(t.name))m+=st.byTag[g]}return m}
+function dimExtra(x,R){const k=dimKind(x.name);
+  if(k==='body'){const m=tagMin(R.st,/锻炼|运动|健身/);return m?`，这一期记录的锻炼时间是 ${fmtMin(m)}`:'，这一期还没有锻炼记录'}
+  if(k==='study'){const m=tagMin(R.st,/学习|阅读|读书/);return m?`，这一期学习相关的记录是 ${fmtMin(m)}`:''}
+  if(k==='money'){if(R.kind==='month'&&+S.meta.budget>0&&R.money)return `，本月已花掉预算的 ${Math.round(R.money.out/S.meta.budget*100)}%`;return R.money?`，这一期支出 ${fmtY(R.money.out)}`:''}
+  if(k==='mood')return R.st.all>=5&&R.rate<50?`清单完成率只有 ${R.rate}%，很可能是排得太满了。`:'';
+  return ''}
+function scoreReport(R){
+  const td=today(),end=R.to<td?R.to:td,s=scoreStats(R.from,end);if(!s)return null;
+  const[pf,pt]=rangeOf(R.kind,shift(R.kind,R.from,-1)),p=scoreStats(pf,pt),f1=x=>x.toFixed(1),n=s.days.length,tips=[],seed=seedOf(R.key),used=new Set();
+  const av=(arr,fn)=>{const v=arr.map(fn).filter(x=>x!=null&&x>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
+  const lines=[`日均 ${Math.round(s.avg)} 分${p?`，上一期 ${Math.round(p.avg)} 分`:''}，共打分 ${n} 天`];
+  for(const dm of s.dims){const pd=p&&p.dims.find(x=>x.id===dm.id),df=pd?dm.avg-pd.avg:0;lines.push(`${dm.name} ${f1(dm.avg)} / 5${pd&&Math.abs(df)>=.2?`，比上一期${df>0?'高':'低'} ${f1(Math.abs(df))}`:''}`)}
+  if(n>=2){const srt=s.days.slice().sort((a,b)=>b.total-a.total);lines.push(`最高 ${mdCN(srt[0].d)} ${srt[0].total} 分；最低 ${mdCN(srt[n-1].d)} ${srt[n-1].total} 分`)}
+  if(n<3)tips.push(`这一期只打了 ${n} 天分。每天花十秒打分，趋势才看得出来，提醒也会更准。`);
+  else{
+    const half=Math.floor(n/2),h1=s.days.slice(0,half),h2=s.days.slice(half),t1=av(h1,x=>x.total),t2=av(h2,x=>x.total),up=t1!=null&&t2!=null&&t2-t1>=6,down=t1!=null&&t2!=null&&t1-t2>=6;
+    if(up)lines.push(`后半段比前半段高 ${Math.round(t2-t1)} 分`);if(down)lines.push(`后半段比前半段低 ${Math.round(t1-t2)} 分`);
+    if(s.avg>=80)tips.push(`这一期日均 ${Math.round(s.avg)} 分，相当出色。别轻描淡写地带过，这是你一天一天做出来的。保持住，下一期再往前一步。`);
+    else if(s.avg<55)tips.push(`这一期整体偏低（日均 ${Math.round(s.avg)} 分）。没关系，低分的日子你也认真记下来了，这就是往回走的第一步。下一期只挑一件最想改的事。`);
+    else if(up)tips.push('总分在往上走，说明最近的调整是对的。记下后半段做对了什么，下一期照着来。');
+    else if(down)tips.push('总分在往下走。下一期先减一两件事，把休息补回来，再谈提速。');
+    const asc=s.dims.slice().sort((a,b)=>a.avg-b.avg);
+    for(const dm of asc.filter(x=>x.avg<=3).slice(0,2)){tips.push(tipText(dm,'low',seed,dimExtra(dm,R)));used.add(dm.id)}
+    for(const dm of s.dims){if(used.has(dm.id))continue;const a1=av(h1,x=>x.v[dm.id]),a2=av(h2,x=>x.v[dm.id]);if(a1!=null&&a2!=null&&a1-a2>=.8){tips.push(tipText(dm,'down',seed));used.add(dm.id);break}}
+    const top=asc[asc.length-1];if(top&&top.avg>=4.2&&!used.has(top.id)){tips.push(tipText(top,'high',seed,dimExtra(top,R)));used.add(top.id)}
+    const f=focusOf(end)||focusOf(R.from);if(f){const ids=Object.keys(f.w||{}).filter(k=>+f.w[k]>1),fd=s.dims.filter(x=>ids.includes(x.id));
+      if(fd.length){const fa=fd.reduce((a,x)=>a+x.avg,0)/fd.length,oa=s.dims.reduce((a,x)=>a+x.avg,0)/s.dims.length,nm=fd.map(x=>x.name).join('、');
+        tips.push(fa>=4?`阶段重点「${f.name}」推进得很好，「${nm}」平均 ${f1(fa)} 分。你说到做到了，继续。`:fa<oa-.2?`这一期的重点是「${f.name}」，但「${nm}」平均只有 ${f1(fa)} 分，还低于其他项。别灰心，把它拆成每天一个最小动作，先连续做三天。`:`重点「${f.name}」对应的「${nm}」平均 ${f1(fa)} 分，在正轨上，再加一把劲。`)}}
+    if(n>=diffDays(R.from,end)+1&&n>=5)tips.push('这一期每天都打了分。这份坚持比分数本身更重要。');
+    if(!tips.length)tips.push('各项都比较平稳。想更进一步，可以设一个阶段重点，让总分更偏向你最在意的那一项。')}
+  return{avg:s.avg,n,lines,tips:tips.slice(0,5)}}
+function dayTip(d){const sc=dayScore(d);if(!sc)return'';const ds=dimsOf().filter(x=>sc.v[x.id]).map(x=>({name:x.name,v:sc.v[x.id],avg:sc.v[x.id]})),seed=seedOf(d);if(!ds.length)return'';
+  const low=ds.slice().sort((a,b)=>a.v-b.v)[0];
+  if(low.v<=2)return tipText(low,'day',seed);
+  if(ds.length>=3&&ds.every(x=>x.v>=4))return pickBy(['今天各项都在 4 分以上，很漂亮的一天。记住这种感觉，明天照着来。','今天状态很好。好日子不是偶然的，是你前面一点点攒出来的，继续。'],seed);
+  if(sc.total>=80)return '今天总分不错。挑一件做得最顺的事，写进当日小结，以后低落的时候翻出来看。';
+  return''}
+{const _sc=scoreCard;scoreCard=function(d){const tip=dayTip(d);return tip?_sc(d).replace('<div class="row small" style="margin-top:12px">',`<p class="daytip">${esc(tip)}</p><div class="row small" style="margin-top:12px">`):_sc(d)}}
+{const _r=render;render=function(f){_r(f);try{if(Store.mode!=='cloud'&&Store.mode!=='local')return;const w=main.querySelector('.wrap');if(w&&!w.querySelector('.quote'))w.insertAdjacentHTML('beforeend',quoteHtml(UI.view==='day'?UI.date:today()));
+  if(UI.view==='month'||UI.view==='week')main.querySelectorAll('.cal-d[data-d],.wd[data-d]').forEach(el=>{if(el.querySelector('.scb'))return;const s=dayScore(el.dataset.d);if(!s)return;const h=el.querySelector('b');if(h)h.insertAdjacentHTML('afterend',`<span class="scb" data-tip="当天评分 ${s.total} 分">${s.total}</span>`)})}catch(e){console.error(e)}}}
 
 boot();
 </script>
