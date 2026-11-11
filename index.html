@@ -448,6 +448,40 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--in
 .scrow{grid-template-columns:minmax(72px,1fr) auto minmax(1.6em,auto)}
 .sug{font-size:11px;font-weight:600;color:var(--accent);border:1px dashed var(--accent);border-radius:99px;padding:1px 8px;white-space:nowrap}
 .sug:hover{background:rgba(var(--accent-rgb),.12)}
+/* 收敛：次要入口收进「更多」，提示条靠后，算法说明 */
+.wrap>.banner:not(.tfbar){order:6}
+.wrap>.modhint{order:8;text-align:center;margin:0}
+.wrap>.quote{order:9}
+.hmore{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hmore>summary{list-style:none;cursor:pointer}
+.hmore>summary::-webkit-details-marker{display:none}
+.hmore:not([open])>.hmenu{display:none}
+.hmenu{display:inline-flex;gap:8px;flex-wrap:wrap}
+.how{font-size:12px;color:var(--ink2);margin-top:14px}
+.how>summary{cursor:pointer;width:fit-content}
+.how ul{list-style:disc;padding-left:18px;margin:6px 0 0;display:flex;flex-direction:column;gap:3px;line-height:1.6}
+/* 未到 / 未记录、积压整理、报告重点、手机周概览 */
+.col.fut,.mbars button.fut{opacity:.5;background:repeating-linear-gradient(135deg,transparent 0 5px,rgba(var(--accent-rgb),.09) 5px 6px)}
+.heat i.fut{background:transparent!important;box-shadow:inset 0 0 0 1px var(--line)}
+.cal-d.fut,.wd.fut{opacity:.72}
+.col em.nr{font-size:10px;opacity:.75}
+.blrow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.blrow:first-child{border-top:0}
+.blrow .nm{flex:1;min-width:150px;display:flex;flex-direction:column}
+.blrow .nm small{color:var(--ink2);font-size:12px}
+.blrow .acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.keyres{border-color:rgba(var(--accent-rgb),.55)}
+.keyres .hl li{font-size:16px;font-weight:600}
+.keyres .hl small{font-weight:400}
+@media (max-width:900px){
+  .wrap>.hero{order:-3}.wrap>.calseg{order:-2}.wrap>.week{order:-1}
+  .wd{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:11px 12px}
+  .wd .h{width:70px;flex:none;justify-content:flex-start;gap:6px}
+  .wd .ft{margin:0 0 0 auto;text-align:right}
+  .wd .its{display:none;flex-basis:100%;order:5}
+  .wd.open .its{display:flex}
+  .wd.open::after{content:"再点一次，打开这一天";flex-basis:100%;order:6;font-size:11px;color:var(--ink2)}
+}
 </style>
 </head>
 <body>
@@ -2082,6 +2116,78 @@ Object.assign(CHG,{
   sleepSet(el){const d=el.dataset.d,M=month(ymOf(d),1),e=M.scores[d]||{v:{}};if(isHM(el.value))e[el.dataset.k]=el.value;else delete e[el.dataset.k];e.u=Date.now();M.scores[d]=e;commit('m-'+ymOf(d))},
 });
 Object.assign(INP,{srch(el){const r=$('#srch-res');if(r)r.innerHTML=searchHtml(el.value)}});
+
+/* ========== 收敛：功能开关、统计口径、更少的入口 ========== */
+const MODS=[['timer','计时器'],['score','每日打分与睡眠'],['note','当日小结与照片'],['money','记账'],['proj','长线项目'],['report','周报 / 月报 / 年报'],['quote','每日一句']];
+function modsOf(){const m=S.meta.mods;if(m&&typeof m==='object')return m;const all=hasAny(),o={};for(const[k]of MODS)o[k]=all||k==='timer';return o}
+const modOn=k=>modsOf()[k]!==false;
+/* 完成率只算到今天为止：排在以后的待做不计入分母 */
+function calc(from,to){
+  const r={min:0,done:0,all:0,adhoc:0,plan:0,future:0,byTag:{},byTitle:{},byDay:{},active:0},TD=today();
+  for(const ym of monthsBetween(from,to)){const M=S.months[ym];if(!M)continue;for(const id in M.tasks){const t=M.tasks[id];if(t.del||t.d<from||t.d>to||!tfOk(t))continue;const m=tmin(t),fut=t.d>TD&&!t.done;
+    if(fut){r.future++;if(!m)continue}else{r.all++;if(t.done)r.done++}if(t.adhoc)r.adhoc++;r.plan+=t.plan||0;r.min+=m;
+    const day=r.byDay[t.d]||(r.byDay[t.d]={min:0,done:0,all:0,byTag:{}});if(!fut){day.all++;if(t.done)day.done++}day.min+=m;const g=tagOf(t.g)?t.g:'';
+    if(m){r.byTag[g]=(r.byTag[g]||0)+m;day.byTag[g]=(day.byTag[g]||0)+m}
+    if(t.done||m){const k=(t.t||'').trim();const e=r.byTitle[k]||(r.byTitle[k]={min:0,n:0,g});e.min+=m;if(t.done)e.n++}}}
+  for(const d in r.byDay)if(r.byDay[d].min>0||r.byDay[d].done>0)r.active++;
+  return r;
+}
+/* 总分：1–5 分折算成 0–100（1 分 = 0，3 分 = 50，5 分 = 100），只算打了分的维度 */
+function dayScore(d){const M=S.months[ymOf(d)],e=M&&M.scores&&M.scores[d];if(!e||!e.v)return null;let W=0,T=0,n=0;const v={};for(const dm of dimsOf()){const x=Math.min(5,Math.max(0,+e.v[dm.id]||0));if(!x)continue;const w=dimW(d,dm.id);W+=w;T+=w*(x-1)*25;n++;v[dm.id]=x}return n?{total:Math.round(T/W),v,n}:null}
+let DELTA_OK=true;
+function delta(cur,prev){if(!DELTA_OK)return '<em>记录还少，暂不和上期比较</em>';if(!prev)return '<em>上期同期无记录</em>';const d=Math.round((cur-prev)/prev*100);return `<em class="${d>0?'up':d<0?'down':''}">${d>0?'↑':d<0?'↓':'持平'}${d?Math.abs(d)+'%':''} 较上期同期</em>`}
+{const _sb=statsBlock;statsBlock=function(v,st,pv,days){DELTA_OK=st.active>=3&&pv.active>=3;let h;try{h=_sb(v,st,pv,days)}finally{DELTA_OK=true}
+  return h.replace('</section>',`<details class="how"><summary>这些数字怎么算的</summary><ul><li>记录用时：只包含计过时、或手动补记了时长的事项；没计时的事不在内。</li><li>完成事项和完成率：只统计到今天为止的事项，排在以后的待做不计入${st.future?`（这段时间另有 ${st.future} 件排在之后）`:''}。</li><li>较上期同期：和上一个周期的相同天数比；任意一方有记录的天数不足 3 天时不比较。</li><li>活跃日均：总用时 ÷ 有记录的天数，而不是 ÷ 全部天数。</li></ul></details></section>`)}}
+{const _ss=scoreSection;scoreSection=function(v){return modOn('score')?_ss(v).replace(/<\/section>$/,'<details class="how"><summary>总分怎么算的</summary><ul><li>每个维度 1–5 分先折算成 0–100：1 分 = 0，3 分 = 50，5 分 = 100。</li><li>再按权重平均；设了阶段重点的维度权重更高。</li><li>没打分的维度不参与，所以只评了一两项的日子，总分只代表那一两项。</li></ul></details></section>'):''}}
+{const _sc=scoreCard;scoreCard=function(d){let h=_sc(d).replace('data-fold="d-score" data-open="1"','data-fold="d-score"');const sc=dayScore(d),n=dimsOf().length;return sc&&sc.n<n?h.replace(`<small>${sc.total} 分</small>`,`<small>${sc.total} 分 · 已评 ${sc.n}/${n} 项</small>`):h}}
+{const _vp=vPrefs;vPrefs=function(){const m=modsOf();return _vp().replace('<section class="card"><h2>打分维度',`<section class="card" data-open="1"><h2>功能 <small>只打开你用得上的</small></h2><p class="small muted" style="margin:0 0 10px">清单和日历始终在。关掉的功能只是不显示，已有的数据不会丢。</p><div class="chips">${MODS.map(([k,n])=>`<label class="chip"><input type="checkbox" data-chg="modSet" data-k="${k}" ${m[k]!==false?'checked':''} style="margin:0">${n}</label>`).join('')}</div><div class="row" style="margin-top:12px"><button class="btn sm" data-act="modPreset" data-v="0">只留清单和计时</button><button class="btn sm" data-act="modPreset" data-v="1">全部打开</button></div></section>\n  <section class="card"><h2>打分维度`)}}
+{const _r=render;render=function(f){_r(f);try{if(Store.mode!=='cloud'&&Store.mode!=='local')return;
+  const rm=s=>main.querySelectorAll(s).forEach(x=>x.remove());
+  document.querySelectorAll('#side .nav a,#tabbar a').forEach(a=>{const h=a.getAttribute('href');if((h==='#money'&&!modOn('money'))||(h==='#projects'&&!modOn('proj'))||(h==='#report'&&!modOn('report')))a.remove()});
+  if(!modOn('timer'))rm('.tcard');if(!modOn('score'))rm('[data-fold=d-score],.scb');if(!modOn('note'))rm('[data-fold=d-note],[data-fold=d-pics]');if(!modOn('money'))rm('[data-fold=d-money]');if(!modOn('proj'))rm('[data-fold=d-proj]');if(!modOn('quote'))rm('.quote');
+  if(!modOn('report'))main.querySelectorAll('[data-act=repGo]').forEach(b=>{const x=b.closest('.banner');if(x)x.remove()});
+  if(UI.view==='day'&&!S.meta.mods&&MODS.some(([k])=>!modOn(k))&&!main.querySelector('.modhint')){const q=main.querySelector('.quote'),w=main.querySelector('.wrap'),t='<p class="modhint small muted">现在只显示清单和计时。打分、记账、长线项目、报告等可以在 <a class="lnk" href="#prefs">设置 → 功能</a> 里按需打开。</p>';if(q)q.insertAdjacentHTML('beforebegin',t);else if(w)w.insertAdjacentHTML('beforeend',t)}
+  const hx=main.querySelector('.hero .hx');if(hx&&!hx.querySelector('.hmore')){const items=[...hx.querySelectorAll('[data-act=srchOpen],[data-act=tfOpen],[data-act=export]')];if(items.length>=2){const d=document.createElement('details');d.className='hmore';if(FOLD_ALL||UI.moreOpen)d.open=true;d.innerHTML=`<summary class="hbtn">更多${UI.tf?' · 筛选中':''}</summary><span class="hmenu"></span>`;hx.appendChild(d);items.forEach(b=>d.lastChild.appendChild(b));d.addEventListener('toggle',()=>{UI.moreOpen=d.open})}}
+}catch(e){console.error(e)}}}
+Object.assign(CHG,{modSet(el){const m={...modsOf()};m[el.dataset.k]=el.checked;S.meta.mods=m;commit('meta')}});
+Object.assign(ACT,{modPreset(el){const on=el.dataset.v==='1',m={};for(const[k]of MODS)m[k]=on||k==='timer';S.meta.mods=m;commit('meta');toast(on?'已打开全部功能':'现在只显示清单和计时')}});
+
+/* ========== 按反馈调整：统计口径、记录流程、手机周概览、积压整理、报告重点 ========== */
+const parkedOf=()=>Array.isArray(S.meta.parked)?S.meta.parked:[];
+function backlogList(){const td=today(),out=[];for(let i=1;i<=60;i++)for(const t of dayTasks(addDays(td,-i)))if(!t.done)out.push(t);return out}
+function backlogModal(){const ts=backlogList(),td=today(),tm=addDays(td,1);
+  openModal(`<h2>整理积压的事<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2>
+  <p class="small muted" style="margin:0">共 ${ts.length} 件。逐件决定：排到今天或明天、改到某一天、先放进暂存箱，或者取消不做。</p>
+  <div style="max-height:54vh;overflow:auto">${ts.map(t=>{const a=`data-d="${t.d}" data-id="${t.id}"`;return `<div class="blrow"><span class="nm"><b>${esc(t.t)}</b><small>原定 ${mdCN(t.d)} · ${esc(tagName(t.g))}${t.mv?` · 已顺延 ${t.mv} 次`:''}</small></span><span class="acts"><button class="btn sm" data-act="blMove" ${a} data-to="${td}">今天</button><button class="btn sm" data-act="blMove" ${a} data-to="${tm}">明天</button><input class="inp sm" type="date" min="${td}" data-chg="blDate" ${a} aria-label="改到某一天" style="width:auto"><button class="btn sm" data-act="blPark" ${a}>暂存</button><button class="btn sm ghost danger" data-act="blDrop" ${a}>取消</button></span></div>`}).join('')||'<p class="empty">没有积压了。</p>'}</div>
+  <div class="foot">${ts.length>1?'<button class="btn sm ghost" data-act="blAll">全部排到今天</button>':''}<span class="sp"></span><button class="btn pri" data-act="close">完成</button></div>`,true)}
+function parkHtml(){const ps=parkedOf();if(!ps.length)return'';const o=FOLD_ALL||FOLD['d-park'];
+  return `<section class="card fold ${o?'open':''}" data-fold="d-park"><h2 tabindex="0" role="button" aria-expanded="${o?'true':'false'}">暂存箱 <small>${ps.length} 件先放着的事</small></h2>${ps.map(p=>`<div class="blrow"><span class="nm"><b>${esc(p.t)}</b><small>${esc(tagName(p.g))}</small></span><span class="acts"><button class="btn sm" data-act="pkAdd" data-id="${esc(p.id)}">排到这一天</button><button class="x" data-act="pkDel" data-id="${esc(p.id)}" aria-label="删除">×</button></span></div>`).join('')}</section>`}
+{const _sb=statsBlock;statsBlock=function(v,st,pv,days){const[a,b]=rangeOf(v,UI.date),td=today(),el=td<a?days:td>b?days:diffDays(a,td)+1;
+  return _sb(v,st,pv,el).replace('<summary>这些数字怎么算的</summary><ul>','<summary>这些数字怎么算的</summary><ul><li>图里带斜纹、变淡的是还没到的日期；标着「未记录」或没有柱子的日期是没有记录，不等于 0。</li><li>「有记录的天数」的分母是已经过去的天数，不含还没到的日子。</li>')}}
+{const _br=buildReport;buildReport=function(k,a){const R=_br(k,a),key=R.ach.filter(x=>x.star||x.big||/^「/.test(x.t)),rec=R.ach.filter(x=>!key.includes(x));R.ach=key;R.ev=rec.concat(R.ev);return R}}
+{const _vr=vReport;vReport=function(){return _vr().replace('<section class="card"><h2>重大成就</h2>','<section class="card keyres"><h2>最重要的成果</h2>').replace('<h2>值得记住的事</h2>','<h2>其他值得记的</h2>').replace('这一期还没有识别到成就。','这一期还没有重要成果。')}}
+{const _r=render;render=function(f){_r(f);try{if(Store.mode!=='cloud'&&Store.mode!=='local')return;const td=today();
+  if(UI.view==='day'){const hero=main.querySelector('.hero'),qa=main.querySelector('form.qa'),tc=main.querySelector('.tcard');main.querySelectorAll('.welcome').forEach(x=>x.remove());
+    if(hero&&qa){hero.insertAdjacentElement('afterend',qa);if(tc){const fs=tc.querySelector('[data-act=freeStart]');if(fs){fs.className='btn';fs.type='button';fs.innerHTML=PLAY+' 计时';fs.dataset.tip='先计时，结束后再选这段时间做了什么';qa.querySelector('.row1').appendChild(fs);tc.remove()}else qa.insertAdjacentElement('afterend',tc)}}
+    const cb=main.querySelector('[data-act=carry]');if(cb){cb.dataset.act='backlog';cb.textContent='整理'}
+    const anchor=main.querySelector('[data-fold=d-time]');if(anchor&&!main.querySelector('[data-fold=d-park]')){const h=parkHtml();if(h)anchor.insertAdjacentHTML('beforebegin',h)}}
+  const week=UI.view==='week';
+  main.querySelectorAll('.col[data-d],.mbars button[data-d],.heat i[data-d],.cal-d[data-d],.wd[data-d]').forEach(el=>{const d=el.dataset.d;
+    if(d>td){el.classList.add('fut');if(el.dataset.tip&&!el.matches('.cal-d,.wd'))el.dataset.tip=mdCN(d)+' 还没到'}
+    else if(week&&el.matches('.col')&&!el.querySelector('em'))el.insertAdjacentHTML('beforeend','<em class="nr" style="bottom:4px">未记录</em>')});
+}catch(e){console.error(e)}}}
+document.addEventListener('click',e=>{const w=e.target.closest&&e.target.closest('.wd');if(!w||!matchMedia('(max-width:900px)').matches||w.classList.contains('open'))return;e.stopPropagation();e.preventDefault();main.querySelectorAll('.wd.open').forEach(x=>x.classList.remove('open'));w.classList.add('open')},true);
+const blTask=el=>getTask(el.dataset.d,el.dataset.id);
+Object.assign(ACT,{
+  backlog(){backlogModal()},
+  blMove(el){const t=blTask(el);if(!t)return;t.mv=(t.mv||0)+1;commit(...moveTask(t,el.dataset.to));backlogModal()},
+  blPark(el){const t=blTask(el);if(!t)return;S.meta.parked=parkedOf().concat({id:t.id,t:t.t,g:t.g||'',plan:t.plan||0,c:Date.now()}).slice(-200);delTask(t);commit('meta','m-'+ymOf(t.d));backlogModal();toast('已放进暂存箱，在今日页下方可以找到')},
+  blDrop(el){const t=blTask(el);if(!t)return;delTask(t);commit('m-'+ymOf(t.d));backlogModal()},
+  blAll(){closeModal();ACT.carry()},
+  pkAdd(el){const p=parkedOf().find(x=>x.id===el.dataset.id);if(!p)return;const t=addTask({t:p.t,d:UI.date,g:p.g,plan:p.plan});S.meta.parked=parkedOf().filter(x=>x.id!==p.id);commit('meta','m-'+ymOf(t.d))},
+  pkDel(el){if(!armed(el))return;S.meta.parked=parkedOf().filter(x=>x.id!==el.dataset.id);commit('meta')},
+});
+Object.assign(CHG,{blDate(el){if(!el.value)return;const t=blTask(el);if(!t)return;t.mv=(t.mv||0)+1;commit(...moveTask(t,el.value));backlogModal()}});
 
 boot();
 </script>
