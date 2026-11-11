@@ -430,6 +430,14 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--in
 .fold>h2::after{content:"";margin-left:auto;width:7px;height:7px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s;flex:none}
 .fold.open>h2::after{transform:rotate(-135deg) translate(-2px,-2px)}
 .fold>h2 .sp{flex:0}
+/* 打分 */
+.scgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px 28px}
+.scrow{display:grid;grid-template-columns:minmax(72px,1fr) auto 1.6em;gap:10px;align-items:center}
+.scrow .nm em{font-style:normal;font-size:11px;font-weight:700;color:var(--accent);margin-left:6px}
+.dots{display:inline-flex;gap:7px}
+.dots button{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:transparent;transition:.12s}
+.dots button:hover{border-color:var(--accent)}
+.dots button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -487,7 +495,7 @@ function defaultMeta(){return{v:1,tags:[{id:'t1',name:'学习',c:1},{id:'t2',nam
 const S={meta:defaultMeta(),months:{},projects:{}};
 const UI={view:'day',date:today(),qaTag:'',metric:'min',openProj:null,q:'',pending:false,focus:null};
 let REV=0;const IDXC={};
-function month(ym,create){let M=S.months[ym];if(!M&&create)M=S.months[ym]={tasks:{},notes:{},skips:{},pics:{},bills:{}};if(M){M.tasks=M.tasks||{};M.notes=M.notes||{};M.skips=M.skips||{};M.pics=M.pics||{};M.bills=M.bills||{}}return M}
+function month(ym,create){let M=S.months[ym];if(!M&&create)M=S.months[ym]={tasks:{},notes:{},skips:{},pics:{},bills:{}};if(M){M.tasks=M.tasks||{};M.notes=M.notes||{};M.skips=M.skips||{};M.pics=M.pics||{};M.bills=M.bills||{};M.scores=M.scores||{}}return M}
 function dayPics(date){const M=S.months[ymOf(date)];if(!M||!M.pics)return[];return Object.values(M.pics).filter(p=>!p.del&&p.d===date).sort((a,b)=>(a.c||0)-(b.c||0))}
 function dayTasks(date){const ym=ymOf(date);let c=IDXC[ym];if(!c||c.rev!==REV){c={rev:REV,by:{}};const M=S.months[ym];if(M)for(const id in M.tasks){const t=M.tasks[id];if(t.del)continue;(c.by[t.d]=c.by[t.d]||[]).push(t)}for(const k in c.by)c.by[k].sort((a,b)=>(a.c||0)-(b.c||0));IDXC[ym]=c}return c.by[date]||[]}
 function dayItems(date){const ts=dayTasks(date).slice();if(date>=today()){const wd=parse(date).getDay(),M=S.months[ymOf(date)];for(const r of S.meta.routines||[]){if(!r.days.includes(wd)||(r.from&&date<r.from))continue;if(ts.some(t=>t.rid===r.id))continue;if(M&&M.skips&&M.skips[date+'|'+r.id])continue;ts.push({id:'r:'+r.id,virt:1,rid:r.id,t:r.t,g:r.g,plan:r.plan||0,rm:r.rm||'',d:date,logs:[],done:0})}}return ts}
@@ -555,10 +563,11 @@ function loadLocal(){const o=readLocal(Store.lkey);if(!o)return;S.meta={...defau
 function touch(id){if(id==='meta')S.meta.u=Date.now();else if(id.startsWith('p-')&&S.projects[id.slice(2)])S.projects[id.slice(2)].u=Date.now();Store.dirty.add(id);saveLocal();if(Store.mode==='cloud'&&!Store.readonly){setSync('saving');clearTimeout(Store.timer);Store.timer=setTimeout(flush,700)}}
 function commit(...docs){REV++;docs.forEach(touch);render(true)}
 function mergeMonth(L,R){
-  const out={tasks:{},notes:{},skips:{},pics:{},bills:{}},cut=Date.now()-30*864e5;
+  const out={tasks:{},notes:{},skips:{},pics:{},bills:{},scores:{}},cut=Date.now()-30*864e5;
   const pick=(a,b)=>!a?b:!b?a:((b.u||0)>(a.u||0)?b:a);
   for(const f of['tasks','pics','bills'])for(const k of new Set([...Object.keys(L[f]||{}),...Object.keys(R[f]||{})])){const v=pick((L[f]||{})[k],(R[f]||{})[k]);if(v.del&&(v.u||0)<cut)continue;out[f][k]=v}
   for(const k of new Set([...Object.keys(L.notes||{}),...Object.keys(R.notes||{})]))out.notes[k]=pick((L.notes||{})[k],(R.notes||{})[k]);
+  for(const k of new Set([...Object.keys(L.scores||{}),...Object.keys(R.scores||{})]))out.scores[k]=pick((L.scores||{})[k],(R.scores||{})[k]);
   for(const k of new Set([...Object.keys(L.skips||{}),...Object.keys(R.skips||{})]))out.skips[k]=Math.max((L.skips||{})[k]||0,(R.skips||{})[k]||0);
   return out;
 }
@@ -1277,6 +1286,7 @@ async function exportPoster(){
   else if(v==='money'){title=`${D.getFullYear()} 年 ${D.getMonth()+1} 月`;sub='收支小结';name='记账-'+ymOf(d)}
   else if(v==='report'){RP=buildReport(UI.rep,d);title=RP.title;sub=RP.sub;st=RP.st;name=RP.file}
   else{title='长线项目';sub=`截至 ${mdCN(today())}`;name='项目-'+today()}
+  if(UI.tf&&v!=='report'&&v!=='money'&&v!=='projects')sub+=' · 仅'+tfLabel();
   try{await Promise.all([document.fonts.load('72px "ZCOOL XiaoWei"',title+'四季手账春夏秋冬0123456789'),document.fonts.ready])}catch(e){}
   const T=(s,x,y,size,color,o={})=>{c.font=`${o.w||400} ${size}px ${o.disp?DISP:SANS}`;c.fillStyle=color;c.textAlign=o.a||'left';c.textBaseline='alphabetic';let str=String(s);if(o.max)while(c.measureText(str).width>o.max&&str.length>1)str=str.slice(0,-2)+'…';c.fillText(str,x,y);return c.measureText(str).width};
   const R=(x,y,w,h,r,fill)=>{if(w<=0||h<=0)return;c.beginPath();if(c.roundRect)c.roundRect(x,y,w,h,Math.min(r,w/2,h/2));else c.rect(x,y,w,h);c.fillStyle=fill;c.fill()};
@@ -1318,7 +1328,7 @@ async function exportPoster(){
     para('总结',[RP.ai||RP.narr]);para('重大成就',RP.ach.map(ln),1);para('值得记住的事',RP.ev.map(ln),1);
     tagSection(RP.st);topSection(RP.st);
     if(RP.foot)para('逐月足迹',RP.foot.map(f=>`${f.m} 月：完成 ${f.done} 件，${fmtMin(f.min)}${f.top?'，主要在做「'+f.top+'」':''}`),1);
-    para('项目进展',RP.proj.map(ln),1);if(RP.money)para('收支',[RP.money.t]);para('待改进',RP.miss.map(ln),1);if(RP.mine)para('我的补充',[RP.mine]);
+    para('项目进展',RP.proj.map(ln),1);if(RP.money)para('收支',[RP.money.t]);if(RP.score){para('评分趋势',RP.score.lines,1);para('小提醒',RP.score.tips,1)}para('待改进',RP.miss.map(ln),1);if(RP.mine)para('我的补充',[RP.mine]);
   }else if(v==='projects'){
     const ps=Object.values(S.projects).filter(p=>!p.arch);if(!ps.length){card(120);T('还没有进行中的项目',M+36,y+70,28,P.ink2);y+=156}
     for(const p of ps){const cc=projCalc(p);const fl=wrap(forecastTxt(p,cc),24,W-2*M-72,3);const h=178+fl.length*36;card(h);T(p.name,M+36,y+58,34,P.ink,{w:700,max:W-2*M-260});T(cc.pct.toFixed(1)+'%',W-M-36,y+66,54,P.ink,{disp:1,a:'right'});
@@ -1458,7 +1468,7 @@ function buildReport(kind,anchor){
   const[from,to]=rangeOf(kind,anchor),td=today(),D=parse(anchor),[nm,per,prev]=REP_CN[kind],[pf,pt]=rangeOf(kind,shift(kind,from,-1));
   const st=calc(from,to),pv=calc(pf,pt),mo=calcMoney(from,to),pmo=calcMoney(pf,pt),rate=st.all?Math.round(st.done/st.all*100):0,open=to>=td&&from<=td,ended=to<td;
   const title=kind==='week'?`周报 · 第 ${isoWeek(anchor)} 周`:kind==='month'?`月报 · ${D.getFullYear()} 年 ${D.getMonth()+1} 月`:`年报 · ${D.getFullYear()} 年`,sub=`${mdCN(from)} – ${mdCN(to)}`+(open?'，截至今天':''),key=repKey(kind,anchor);
-  const tasks=[];for(const ym of monthsBetween(from,to)){const M=S.months[ym];if(!M)continue;for(const id in M.tasks){const t=M.tasks[id];if(!t.del&&t.d>=from&&t.d<=to)tasks.push(t)}}
+  const tasks=[];for(const ym of monthsBetween(from,to)){const M=S.months[ym];if(!M)continue;for(const id in M.tasks){const t=M.tasks[id];if(!t.del&&t.d>=from&&t.d<=to&&tfOk(t))tasks.push(t)}}
   tasks.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:(a.c||0)-(b.c||0));
   const f0=parse(from).getTime(),f1=parse(to).getTime()+864e5,inR=ms=>ms>=f0&&ms<f1,dms=ms=>mdCN(ymd(new Date(ms))),wk=d=>`${mdCN(d)}（周${WD[parse(d).getDay()]}）`;
   const ach=[],ev=[],miss=[],proj=[],lim=kind==='week'?4:kind==='month'?6:8;
@@ -1773,6 +1783,109 @@ Object.assign(SUB,{
 Object.assign(CHG,{
   fx(el){S.meta.fx=el.checked;commit('meta')},
   freePick(el){const b=$('#fnew');if(b)b.style.display=el.value?'none':'flex'},
+});
+
+/* ========== 标签筛选（视图、统计、报告、导出都只看选中的标签） ========== */
+UI.tf=null;
+const tfOk=t=>!UI.tf||UI.tf.has(tagOf(t.g)?t.g:'');
+const tfLabel=()=>UI.tf?[...UI.tf].map(g=>tagName(g)).join('、'):'';
+{const _dt=dayTasks;dayTasks=function(d){const a=_dt(d);return UI.tf?a.filter(tfOk):a}}
+{const _di=dayItems;dayItems=function(d){const a=_di(d);return UI.tf?a.filter(tfOk):a}}
+{const _rl=Remind.list.bind(Remind);Remind.list=function(){const s=UI.tf;UI.tf=null;try{return _rl()}finally{UI.tf=s}}}
+function calc(from,to){
+  const r={min:0,done:0,all:0,adhoc:0,plan:0,byTag:{},byTitle:{},byDay:{},active:0};
+  for(const ym of monthsBetween(from,to)){const M=S.months[ym];if(!M)continue;for(const id in M.tasks){const t=M.tasks[id];if(t.del||t.d<from||t.d>to||!tfOk(t))continue;const m=tmin(t);r.all++;if(t.done)r.done++;if(t.adhoc)r.adhoc++;r.plan+=t.plan||0;r.min+=m;
+    const day=r.byDay[t.d]||(r.byDay[t.d]={min:0,done:0,all:0,byTag:{}});day.all++;if(t.done)day.done++;day.min+=m;const g=tagOf(t.g)?t.g:'';
+    if(m){r.byTag[g]=(r.byTag[g]||0)+m;day.byTag[g]=(day.byTag[g]||0)+m}
+    if(t.done||m){const k=(t.t||'').trim();const e=r.byTitle[k]||(r.byTitle[k]={min:0,n:0,g});e.min+=m;if(t.done)e.n++}}}
+  for(const d in r.byDay)if(r.byDay[d].min>0||r.byDay[d].done>0)r.active++;
+  return r;
+}
+function tfInject(){
+  if(Store.mode!=='cloud'&&Store.mode!=='local')return;if(!['day','week','month','year','report'].includes(UI.view))return;
+  const ex=main.querySelector('.hero .hx [data-act=export]');if(ex&&!main.querySelector('[data-act=tfOpen]'))ex.insertAdjacentHTML('beforebegin',`<button class="hbtn" data-act="tfOpen">筛选标签${UI.tf?' · '+UI.tf.size:''}</button>`);
+  if(UI.tf&&!main.querySelector('.tfbar')){const a=main.querySelector('.calseg')||main.querySelector('.hero');if(a)a.insertAdjacentHTML('afterend',`<div class="banner tfbar"><span>只显示：<b>${esc(tfLabel())}</b>。统计、报告和导出的图片也只算这些。</span><span class="sp"></span><button class="btn sm" data-act="tfClear">显示全部</button></div>`)}
+}
+{const _r=render;render=function(f){_r(f);try{tfInject()}catch(e){console.error(e)}}}
+
+/* ========== 每日打分：多维度、按阶段重点加权 ========== */
+function DEF_DIMS(){return[{id:'d1',name:'学习'},{id:'d2',name:'心情'},{id:'d3',name:'收支'},{id:'d4',name:'身体'},{id:'d5',name:'睡眠'}]}
+const dimsOf=()=>Array.isArray(S.meta.dims)&&S.meta.dims.length?S.meta.dims:DEF_DIMS();
+const focusList=()=>Array.isArray(S.meta.focus)?S.meta.focus:[];
+function focusOf(d){const fs=focusList().filter(f=>f.from<=d&&d<=f.to);return fs.length?fs.sort((a,b)=>(b.c||0)-(a.c||0))[0]:null}
+const dimW=(d,id)=>{const f=focusOf(d),w=f&&f.w?+f.w[id]:0;return w>1?w:1};
+function dayScore(d){const M=S.months[ymOf(d)],e=M&&M.scores&&M.scores[d];if(!e||!e.v)return null;let W=0,T=0,n=0;const v={};for(const dm of dimsOf()){const x=Math.min(5,Math.max(0,+e.v[dm.id]||0));if(!x)continue;const w=dimW(d,dm.id);W+=w;T+=w*x;n++;v[dm.id]=x}return n?{total:Math.round(T/W*20),v,n}:null}
+function scoreStats(from,to){const days=[];for(let d=from;d<=to;d=addDays(d,1)){const s=dayScore(d);if(s)days.push({d,total:s.total,v:s.v})}if(!days.length)return null;
+  const dims=dimsOf().map(dm=>{const vs=days.map(x=>x.v[dm.id]).filter(Boolean);return{id:dm.id,name:dm.name,n:vs.length,avg:vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:0}}).filter(x=>x.n);
+  return{days,dims,avg:days.reduce((a,x)=>a+x.total,0)/days.length}}
+function scoreCard(d){const sc=dayScore(d),e=(sc&&sc.v)||{},f=focusOf(d);
+  return `<section class="card" data-fold="d-score" data-open="1"><h2>给这一天打分 <small>${sc?sc.total+' 分':'还没打分'}</small></h2>
+  <div class="scgrid">${dimsOf().map(dm=>{const w=dimW(d,dm.id),cur=e[dm.id]||0;return `<div class="scrow"><span class="nm">${esc(dm.name)}${w>1?`<em>×${w}</em>`:''}</span><span class="dots" role="group" aria-label="${esc(dm.name)}评分">${[1,2,3,4,5].map(v=>`<button data-act="scoreSet" data-d="${d}" data-dim="${esc(dm.id)}" data-v="${v}" aria-pressed="${cur>=v}" aria-label="${esc(dm.name)} ${v} 分"></button>`).join('')}</span><span class="num muted">${cur||'–'}</span></div>`}).join('')}</div>
+  <div class="row small" style="margin-top:12px"><span class="muted grow">${f?`当前重点：<b style="color:var(--ink)">${esc(f.name)}</b>（${mdCN(f.from)} – ${mdCN(f.to)}）。带 × 的维度在总分里占更大比重。`:'可以设一个阶段重点，比如这周攒钱、这个月健身，对应的维度在总分里占更大比重。'}</span><button class="btn sm" data-act="focusOpen" data-d="${d}">${f?'修改重点':'设置重点'}</button></div></section>`}
+function scoreSection(v){const[a,b]=rangeOf(v,UI.date),s=scoreStats(a,b),td=today();let bars='';
+  if(s){const by={};s.days.forEach(x=>by[x.d]=x.total);const ds=v==='year'?s.days.map(x=>x.d):[...Array(diffDays(a,b)+1)].map((_,i)=>addDays(a,i));
+    bars=`<div class="mbars" style="height:96px">${ds.map(d=>`<button class="${d===td?'td':''}" data-act="goDay" data-d="${d}" data-tip="${mdCN(d)} ${by[d]!=null?by[d]+' 分':'未打分'}" aria-label="${mdCN(d)} ${by[d]!=null?by[d]+' 分':'未打分'}"><i style="height:${by[d]||0}%"></i></button>`).join('')}</div><div class="tl-ax"><span>${mdCN(ds[0])}</span><span>每天的总分，满分 100</span><span>${mdCN(ds[ds.length-1])}</span></div>
+    <div style="margin-top:12px">${s.dims.map(x=>`<div class="tagrow"><span class="nm">${esc(x.name)}</span><span class="bar"><i style="width:${x.avg/5*100}%;background:var(--accent)"></i></span><span class="v">${x.avg.toFixed(1)} / 5</span><span class="p">${x.n} 天</span></div>`).join('')}</div>`}
+  return `<section class="card" data-fold="score-${v}"><h2>评分 <small>${s?`平均 ${Math.round(s.avg)} 分 · 打分 ${s.days.length} 天`:'这段时间还没打分'}</small></h2>${s?bars:'<p class="empty" style="padding:0">在「今日」页给每天打分后，这里显示分数走势和各维度平均。</p>'}</section>`}
+function dimTip(x){const n=x.name,a=x.avg.toFixed(1);
+  if(/睡/.test(n))return `「${n}」平均 ${a} 分，是最低的一项。先固定起床时间，睡前一小时不看屏幕。`;
+  if(/身体|健身|运动|锻炼|健康/.test(n))return `「${n}」平均 ${a} 分，是最低的一项。先保证每周两三次、每次二十分钟的活动量，比偶尔一次大运动量更容易坚持。`;
+  if(/学习|工作|专注/.test(n))return `「${n}」平均 ${a} 分，是最低的一项。把最难的一块放在一天里精力最好的时段，先做 25 分钟再说。`;
+  if(/心情|情绪/.test(n))return `「${n}」平均 ${a} 分，是最低的一项。看看低分那几天发生了什么，在当日小结里记一笔，下次能提前避开。`;
+  if(/收支|钱|消费|花/.test(n))return `「${n}」平均 ${a} 分，是最低的一项。看一下账本里占比最高的分类，给它定一个每周上限。`;
+  return `「${n}」平均 ${a} 分，是最低的一项，下一期可以把它设为重点。`}
+function scoreReport(R){
+  const td=today(),end=R.to<td?R.to:td,s=scoreStats(R.from,end);if(!s)return null;
+  const[pf,pt]=rangeOf(R.kind,shift(R.kind,R.from,-1)),p=scoreStats(pf,pt),f1=x=>x.toFixed(1),n=s.days.length,tips=[];
+  const av=(arr,fn)=>{const v=arr.map(fn).filter(x=>x!=null&&x>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
+  const lines=[`日均 ${Math.round(s.avg)} 分${p?`，上一期 ${Math.round(p.avg)} 分`:''}，共打分 ${n} 天`];
+  for(const dm of s.dims){const pd=p&&p.dims.find(x=>x.id===dm.id),df=pd?dm.avg-pd.avg:0;lines.push(`${dm.name} ${f1(dm.avg)} / 5${pd&&Math.abs(df)>=.2?`，比上一期${df>0?'高':'低'} ${f1(Math.abs(df))}`:''}`)}
+  if(n>=2){const srt=s.days.slice().sort((a,b)=>b.total-a.total);lines.push(`最高 ${mdCN(srt[0].d)} ${srt[0].total} 分；最低 ${mdCN(srt[n-1].d)} ${srt[n-1].total} 分`)}
+  if(n<3)tips.push(`这一期只打了 ${n} 天分。每天花十秒打分，趋势才看得出来。`);
+  else{const half=Math.floor(n/2),h1=s.days.slice(0,half),h2=s.days.slice(half),t1=av(h1,x=>x.total),t2=av(h2,x=>x.total);
+    if(t1!=null&&t2!=null){if(t2-t1>=6){lines.push(`后半段比前半段高 ${Math.round(t2-t1)} 分`);tips.push('总分在往上走。记下后半段做对了什么，下一期照着来。')}else if(t1-t2>=6){lines.push(`后半段比前半段低 ${Math.round(t1-t2)} 分`);tips.push('总分在往下走。下一期先减一两件事，把休息补回来。')}}
+    const low=s.dims.slice().sort((a,b)=>a.avg-b.avg)[0];if(low&&low.avg<=3.4)tips.push(dimTip(low));
+    for(const dm of s.dims){if(dm===low)continue;const a1=av(h1,x=>x.v[dm.id]),a2=av(h2,x=>x.v[dm.id]);if(a1!=null&&a2!=null&&a1-a2>=.8){tips.push(`「${dm.name}」后半段比前半段低了 ${f1(a1-a2)} 分，留意是不是在透支。`);break}}
+    const f=focusOf(end)||focusOf(R.from);if(f){const ids=Object.keys(f.w||{}).filter(k=>+f.w[k]>1),fd=s.dims.filter(x=>ids.includes(x.id));
+      if(fd.length){const fa=fd.reduce((a,x)=>a+x.avg,0)/fd.length,oa=s.dims.reduce((a,x)=>a+x.avg,0)/s.dims.length,nm=fd.map(x=>x.name).join('、');tips.push(fa<oa-.2?`这一期的重点是「${f.name}」，但「${nm}」平均只有 ${f1(fa)} 分，低于其他项，值得先解决它。`:`重点「${f.name}」对应的「${nm}」平均 ${f1(fa)} 分，保持住。`)}}
+    if(!tips.length)tips.push('各项都比较平稳。想更进一步，可以设一个阶段重点，让总分更偏向你最在意的那一项。')}
+  return{avg:s.avg,n,lines,tips:tips.slice(0,4)}}
+{const _br=buildReport;buildReport=function(k,a){const R=_br(k,a);R.score=scoreReport(R);if(R.score)R.narr+=`这一期日均评分 ${Math.round(R.score.avg)} 分。`;if(UI.tf)R.sub+=' · 仅'+tfLabel();return R}}
+{const _vr=vReport;vReport=function(){const R=buildReport(UI.rep,UI.date),sc=R.score,ls=a=>a.map(t=>({t}));
+  const card=`<section class="card"><h2>评分趋势与小提醒</h2>${sc?`${hlList(ls(sc.lines),'')}<div class="sec-h" style="margin:14px 0 8px">小提醒</div>${hlList(ls(sc.tips),'')}`:'<p class="empty" style="padding:0">这一期还没有打分。在「今日」页给每天打分后，这里会总结分数走势并给出提醒。</p>'}</section>`;
+  return _vr().replace('<section class="card"><h2>待改进</h2>',card+'\n  <section class="card"><h2>待改进</h2>')}}
+{const _rt=repText;repText=function(R){let t=_rt(R);if(R.score)t+='\n## 评分趋势\n'+R.score.lines.map(x=>'- '+x).join('\n')+'\n\n## 小提醒\n'+R.score.tips.map(x=>'- '+x).join('\n')+'\n';return t}}
+{const _sb=statsBlock;statsBlock=function(v,st,pv,days){return _sb(v,st,pv,days)+scoreSection(v)}}
+{const _vd=vDay;vDay=function(){return _vd().replace('<section class="card" data-fold="d-note">',scoreCard(UI.date)+'\n  <section class="card" data-fold="d-note">')}}
+{const _vp=vPrefs;vPrefs=function(){return _vp().replace('<section class="card"><h2>界面',`<section class="card"><h2>打分维度 <small>每天打分用的项目</small></h2><div class="chips">${dimsOf().map(d=>`<span class="chip">${esc(d.name)}<button class="x xs" data-act="dimDel" data-id="${esc(d.id)}" aria-label="删除维度 ${esc(d.name)}">×</button></span>`).join('')}</div><form class="row" data-sub="dimAdd" style="margin-top:12px;flex-wrap:nowrap"><input class="inp sm grow" name="n" placeholder="新维度，如：社交" aria-label="新维度" maxlength="8" required><button class="btn sm">添加维度</button></form></section>\n  <section class="card"><h2>界面`)}}
+{const _ci=cleanImport;cleanImport=function(o){_ci(o);for(const ym in o.months){const sc=o.months[ym].scores,out={};if(sc&&typeof sc==='object')for(const d in sc){if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!sc[d]||typeof sc[d].v!=='object')continue;const v={};for(const k in sc[d].v)if(/^[\w:.\-]{1,40}$/.test(k)){const x=Math.round(+sc[d].v[k]);if(x>=1&&x<=5)v[k]=x}out[d]={v,u:+sc[d].u||0}}o.months[ym].scores=out}}}
+function focusModal(d){const f=focusOf(d),[wa,wb]=rangeOf('week',d),w=(f&&f.w)||{};
+  openModal(`<h2>阶段重点<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2>
+  <form data-sub="focusSave" data-id="${f?esc(f.id):''}" style="display:flex;flex-direction:column;gap:12px">
+    <label class="f">这段时间最想做到什么<input class="inp" name="name" value="${esc(f?f.name:'')}" placeholder="如：攒钱 / 备考 / 健身" maxlength="20" required autofocus></label>
+    <div class="row"><label class="f grow">从<input class="inp" type="date" name="from" value="${f?f.from:wa}" required></label><label class="f grow">到<input class="inp" type="date" name="to" value="${f?f.to:wb}" required></label></div>
+    <div class="row"><button type="button" class="btn sm" data-act="focusRange" data-k="week" data-d="${d}">本周</button><button type="button" class="btn sm" data-act="focusRange" data-k="month" data-d="${d}">本月</button></div>
+    <div><div class="sec-h" style="margin-bottom:8px">各维度在总分里的比重</div>${dimsOf().map(dm=>`<div class="tagedit" style="grid-template-columns:minmax(0,1fr) auto"><span>${esc(dm.name)}</span><select class="inp sm" name="w-${esc(dm.id)}" style="width:auto" aria-label="${esc(dm.name)}的比重"><option value="1">普通 ×1</option><option value="2" ${+w[dm.id]===2?'selected':''}>较重要 ×2</option><option value="3" ${+w[dm.id]===3?'selected':''}>重点 ×3</option></select></div>`).join('')}</div>
+    <div class="foot">${f?'<button type="button" class="btn ghost danger" data-act="focusDel" data-id="'+esc(f.id)+'">删除这个重点</button>':''}<span class="sp"></span><button type="button" class="btn" data-act="close">取消</button><button class="btn pri">保存</button></div></form>`)}
+Object.assign(ACT,{
+  tfOpen(){const cur=UI.tf,ids=[...S.meta.tags.map(t=>t.id),''];
+    openModal(`<h2>只看哪些标签<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2><p class="small muted" style="margin:0">选中的标签会用于当前所有视图、统计、报告和导出的图片。比如汇报工作时只勾工作相关的标签。</p>
+    <form data-sub="tfSave" style="display:flex;flex-direction:column;gap:12px"><div class="chips">${ids.map(g=>`<label class="chip"><input type="checkbox" name="g" value="${esc(g)}" ${!cur||cur.has(g)?'checked':''} style="margin:0"><i class="dot" style="background:${tagColor(g)}"></i>${esc(tagName(g))}</label>`).join('')}</div>
+    <div class="foot"><button type="button" class="btn sm ghost" data-act="tfAll" data-v="1">全选</button><button type="button" class="btn sm ghost" data-act="tfAll" data-v="0">全不选</button><span class="sp"></span><button class="btn pri">应用</button></div></form>`)},
+  tfAll(el){el.closest('form').querySelectorAll('[name=g]').forEach(c=>c.checked=el.dataset.v==='1')},
+  tfClear(){UI.tf=null;REV++;render(true)},
+  scoreSet(el){const d=el.dataset.d,M=month(ymOf(d),1),e=M.scores[d]||{v:{}},k=el.dataset.dim,v=+el.dataset.v;e.v=e.v||{};if(+e.v[k]===v)delete e.v[k];else e.v[k]=v;e.u=Date.now();M.scores[d]=e;commit('m-'+ymOf(d))},
+  focusOpen(el){focusModal(el.dataset.d||UI.date)},
+  focusRange(el){const f=el.closest('form'),[a,b]=rangeOf(el.dataset.k,el.dataset.d);f.elements.from.value=a;f.elements.to.value=b},
+  focusDel(el){if(!armed(el))return;S.meta.focus=focusList().filter(f=>f.id!==el.dataset.id);closeModal();commit('meta')},
+  dimDel(el){if(!armed(el))return;const ds=dimsOf();if(ds.length<=1){toast('至少保留一个维度');return}S.meta.dims=ds.filter(d=>d.id!==el.dataset.id);commit('meta')},
+});
+Object.assign(SUB,{
+  tfSave(f){const all=[...f.querySelectorAll('[name=g]')],on=all.filter(c=>c.checked).map(c=>c.value);if(!on.length){toast('至少选一个标签');return}UI.tf=on.length===all.length?null:new Set(on);REV++;closeModal();render(true)},
+  focusSave(f){const E=f.elements,name=E.name.value.trim(),from=E.from.value,to=E.to.value;if(!name||!from||!to)return;if(to<from){toast('结束日期不能早于开始日期');return}
+    const w={};for(const dm of dimsOf()){const v=+E['w-'+dm.id].value;if(v>1)w[dm.id]=v}if(!Object.keys(w).length){toast('至少把一个维度设为「较重要」或「重点」');return}
+    const list=focusList().filter(x=>x.id!==f.dataset.id);list.push({id:f.dataset.id||uid(),name,from,to,w,c:Date.now()});S.meta.focus=list.slice(-40);closeModal();commit('meta');toast('已设置阶段重点')},
+  dimAdd(f){const n=f.elements.n.value.trim();if(!n)return;const ds=dimsOf().slice();if(ds.some(d=>d.name===n)){toast('已有同名维度');return}if(ds.length>=8){toast('最多 8 个维度');return}ds.push({id:'d'+uid(),name:n});S.meta.dims=ds;commit('meta')},
 });
 
 boot();
