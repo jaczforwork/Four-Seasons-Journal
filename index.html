@@ -366,7 +366,7 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--in
 .hl li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);transform:translateY(-1px)}
 .hl li.star::before{content:"★";background:none;width:auto;height:auto;color:var(--accent);font-size:13px;transform:none}
 .hl small{display:block;color:var(--ink2);font-size:12px}
-.rep-lead p{margin:0;font-size:16px;line-height:1.8;max-width:65ch}
+.rep-lead p{margin:0;font-size:16px;line-height:1.8}
 .lnk{color:var(--accent);text-decoration:underline;font-size:inherit;font-weight:500}
 .foot-m{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;padding:7px 0;border-top:1px solid var(--line);font-size:14px;align-items:baseline}
 .card>h2+.foot-m{border-top:0}
@@ -507,6 +507,62 @@ a.hbtn{text-decoration:none}
 .hero.hero-s:has(.hmore[open]){flex-wrap:wrap}
 .hero.hero-s:has(.hmore[open]) .hx{flex-wrap:wrap;flex:1 1 100%}
 }
+.logs span.fut{opacity:.6;border:1px dashed var(--line);background:none}
+/* 报告页 */
+.rep-top{padding:18px 20px}
+.rep-narr{margin:0;font-size:16px;line-height:1.85}
+.rk{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 20px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.rk>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rk span{font-size:12px;color:var(--ink2)}
+.rk b{font-size:22px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}
+.rk b small{font-size:13px;font-weight:500;color:var(--ink2);margin-left:2px}
+.rk em{font-style:normal;font-size:12px;color:var(--ink2)}
+.rk em.up{color:var(--good)}.rk em.down{color:var(--bad)}
+.rsec h3{font-size:12px;font-weight:600;color:var(--ink2);margin:0 0 8px;display:flex;gap:8px;align-items:baseline}
+.rsec h3 small{font-weight:400}
+.rcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 28px}
+.rcols>.w2{grid-column:1/-1}
+.rminor{font-size:13px}
+.rminor>h2{font-size:14px;color:var(--ink2)}
+.rminor .hl{gap:6px}.rminor .hl li{font-size:13px}
+.rminor .actrow,.rminor .foot-m{font-size:13px;padding:5px 0}
+.rbars{display:grid;align-items:end;gap:2px;height:84px;border-bottom:1px solid var(--line)}
+.rbars button{min-width:0;height:100%;display:flex;align-items:flex-end;border-radius:4px 4px 0 0}
+.rbars button:hover{background:rgba(var(--accent-rgb),.08)}
+.rbars .st{display:flex;flex-direction:column-reverse;width:100%;max-width:34px;margin:0 auto;border-radius:3px 3px 0 0;overflow:hidden}
+.rbars .st i{display:block;min-height:0}
+.rbars button.fut{opacity:.5;background:repeating-linear-gradient(135deg,transparent 0 5px,rgba(var(--accent-rgb),.09) 5px 6px)}
+.rbl{display:grid;gap:2px;font-size:11px;color:var(--ink2);margin-top:4px;text-align:center}
+.rbl .cur{color:var(--accent);font-weight:700}
+.rtiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.rtiles>div{border-radius:12px;padding:9px 12px;background:var(--surface2);display:flex;flex-direction:column;gap:1px;min-width:0}
+.rtiles span{font-size:12px;color:var(--ink2)}
+.rtiles b{font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rtiles .in{background:color-mix(in srgb,var(--good) 13%,transparent)}.rtiles .in b{color:var(--good)}
+.rtiles .out{background:color-mix(in srgb,var(--bad) 11%,transparent)}.rtiles .out b{color:var(--bad)}
+.rdon{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.rdon .grow{flex:1 1 200px;min-width:0}
+.donut{width:112px;height:112px;flex:none;margin:0 auto}
+.rline{width:100%;height:auto;display:block}
+.rpj{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+.rpj:first-of-type{border-top:0;padding-top:0}
+.rpj-h{display:flex;align-items:baseline;gap:10px}
+.rpj-h b{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rpj-h em{font-style:normal;color:var(--good);font-size:12px;margin-right:8px}
+.rpj .pb{height:8px;border-radius:99px;background:rgba(var(--accent-rgb),.12);display:flex;overflow:hidden}
+.rpj .pb i{background:rgba(var(--accent-rgb),.38)}
+.rpj .pb i.g{background:var(--accent)}
+.rpj small{font-size:12px;color:var(--ink2)}
+.rnote{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;padding:7px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.7;align-items:baseline}
+.rnote:first-of-type{border-top:0}
+.rnote span{white-space:pre-wrap;overflow-wrap:anywhere}
+.ordp{border-color:rgba(var(--accent-rgb),.55)}
+.ordrow{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;margin-top:6px;cursor:grab;background:var(--surface)}
+.ordrow.drag{opacity:.45}
+.ordrow .grip{color:var(--ink2);width:18px;text-align:center}
+.ordrow .nm{flex:1;min-width:0}
+.ordrow .btn{min-width:34px;padding:0}
+@media (max-width:640px){.rk{grid-template-columns:repeat(2,minmax(0,1fr))}.rcols{grid-template-columns:minmax(0,1fr)}.rep-top{padding:16px}}
 </style>
 </head>
 <body>
@@ -598,7 +654,7 @@ function ruleW(g){let w=[0,2,5,8][g.size||2];const n=g.name||'';if(/撰写|写�
 const goalW=g=>g.w!=null?g.w:ruleW(g);
 function projCalc(p){
   const out={pct:0,invested:0};
-  if(p.kind==='qty'){out.sum=(p.logs||[]).reduce((a,l)=>a+l.n,0);out.pct=p.target?Math.min(100,out.sum/p.target*100):0}
+  if(p.kind==='qty'){const T=today();out.sum=0;out.fut=0;out.day=0;for(const l of p.logs||[]){if(l.d>T)out.fut+=l.n;else{out.sum+=l.n;if(l.d===T)out.day+=l.n}}out.pct=p.target?Math.min(100,out.sum/p.target*100):0}
   else{let W=0,D=0,n=0,dn=0;for(const s of p.stages||[])for(const g of s.goals||[]){const w=goalW(g);W+=w;D+=w*(g.pct||0)/100;n++;if((g.pct||0)>=100)dn++}out.pct=W?D/W*100:0;out.n=n;out.dn=dn;out.naive=n?dn/n*100:0}
   for(const ym in S.months)for(const id in S.months[ym].tasks){const t=S.months[ym].tasks[id];if(!t.del&&t.pid===p.id)out.invested+=tmin(t)}
   // 预测
@@ -876,9 +932,9 @@ function timeline(items){
 function projStrip(){
   const ps=Object.values(S.projects).filter(p=>!p.arch);if(!ps.length)return `<p class="empty">写综述、背 6000 个单词这类长线目标，可以到「长线项目」里建立，之后每天在这里一键记进度。</p>`;
   return ps.map(p=>{const c=projCalc(p);let ctl='';
-    if(p.kind==='qty')ctl=`<form class="row" data-sub="qLog" data-p="${p.id}" data-date="${UI.date}" style="flex-wrap:nowrap;gap:6px"><input class="inp sm num" style="width:96px" type="number" min="0.01" step="any" name="n" placeholder="今日数量" aria-label="今日完成数量（${esc(p.unit||'')}）" required><button class="btn sm">记录</button></form>`;
+    if(p.kind==='qty')ctl=UI.date>today()?'<span class="small muted">这一天还没到</span>':`<form class="row" data-sub="qLog" data-p="${p.id}" data-date="${UI.date}" style="flex-wrap:nowrap;gap:6px"><input class="inp sm num" style="width:96px" type="number" min="0.01" step="any" name="n" placeholder="${UI.date===today()?'今日数量':'这一天的数量'}" aria-label="这一天完成的数量（${esc(p.unit||'')}）" required><button class="btn sm">记录</button></form>`;
     else{let nx=null,ns=null;for(const s of p.stages||[]){for(const g of s.goals||[])if((g.pct||0)<100){nx=g;ns=s;break}if(nx)break}ctl=nx?`<button class="btn sm" data-act="gToggle" data-p="${p.id}" data-s="${ns.id}" data-g="${nx.id}" data-tip="${esc(nx.name)}">完成下一步</button>`:''}
-    let nextTxt='';if(p.kind==='ms'){for(const s of p.stages||[]){const g=(s.goals||[]).find(g=>(g.pct||0)<100);if(g){nextTxt='下一步：'+g.name;break}}}else nextTxt=`${c.sum} / ${p.target} ${p.unit||''}`;
+    let nextTxt='';if(p.kind==='ms'){for(const s of p.stages||[]){const g=(s.goals||[]).find(g=>(g.pct||0)<100);if(g){nextTxt='下一步：'+g.name;break}}}else{const dn=(p.logs||[]).filter(l=>l.d===UI.date).reduce((a,l)=>a+l.n,0);nextTxt=`${UI.date===today()?'今天':'这一天'} ${dn?'+'+dn:'还没记'} · 累计 ${c.sum} / ${p.target} ${p.unit||''}`}
     return `<div class="strip"><div style="min-width:0"><b>${esc(p.name)}</b> <span class="num muted small">${c.pct.toFixed(1)}%</span><div class="small muted" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nextTxt)}</div></div>${ctl}<div class="pbar" style="grid-column:1/-1"><i style="width:${c.pct}%"></i></div></div>`}).join('');
 }
 function vDay(){
@@ -962,7 +1018,7 @@ function vYear(){
 function spark(p,c){
   // 累计进度折线 + 目标线 + 预测虚线
   const td=today(),start=p.start||td;let pts=[],max;
-  if(p.kind==='qty'){max=p.target||1;const by={};for(const l of p.logs||[])by[l.d]=(by[l.d]||0)+l.n;let acc=0;const ds=Object.keys(by).sort();const s0=ds.length&&ds[0]<start?ds[0]:start;pts.push({d:s0,v:0});for(const d of ds){acc+=by[d];pts.push({d,v:acc})}if(pts[pts.length-1].d<td)pts.push({d:td,v:acc})}
+  if(p.kind==='qty'){max=p.target||1;const by={};for(const l of p.logs||[])if(l.d<=td)by[l.d]=(by[l.d]||0)+l.n;let acc=0;const ds=Object.keys(by).sort();const s0=ds.length&&ds[0]<start?ds[0]:start;pts.push({d:s0,v:0});for(const d of ds){acc+=by[d];pts.push({d,v:acc})}if(pts[pts.length-1].d<td)pts.push({d:td,v:acc})}
   else{max=100;const h=p.hist||{};pts.push({d:start,v:0});for(const d of Object.keys(h).sort())if(d>=start)pts.push({d,v:h[d]});if(pts[pts.length-1].d<td)pts.push({d:td,v:c.pct})}
   const d0=pts[0].d;let d1=td;if(p.due&&p.due>d1)d1=p.due;if(c.eta&&c.eta>d1&&diffDays(td,c.eta)<400)d1=c.eta;if(d1===d0)d1=addDays(d0,1);
   const W=600,H=92,px=d=>8+diffDays(d0,d)/diffDays(d0,d1)*(W-16),py=v=>H-10-Math.min(1,v/max)*(H-22);
@@ -971,7 +1027,7 @@ function spark(p,c){
   const due=p.due?`<line x1="${px(p.due)}" x2="${px(p.due)}" y1="6" y2="${H-10}" stroke="var(--ink2)" stroke-dasharray="2 4"/><text x="${px(p.due)-4}" y="${H-14}" text-anchor="end" font-size="11" fill="var(--ink2)">截止</text>`:'';
   return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="累计进度走势"><line x1="8" x2="${W-8}" y1="${py(max)}" y2="${py(max)}" stroke="var(--line)" stroke-dasharray="4 4"/><line x1="8" x2="${W-8}" y1="${H-10}" y2="${H-10}" stroke="var(--line)"/>${due}
   <polygon points="${px(pts[0].d)},${H-10} ${line} ${px(last.d)},${H-10}" fill="rgba(var(--accent-rgb),.14)"/><polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>${proj}<circle cx="${px(last.d)}" cy="${py(last.v)}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/></svg>
-  <div class="tl-ax"><span>${mdCN(d0)}</span><span>今天 ${p.kind==='qty'?c.sum+' '+esc(p.unit||''):c.pct.toFixed(1)+'%'}</span><span>${mdCN(d1)}</span></div>`;
+  <div class="tl-ax"><span>${mdCN(d0)}</span><span>截至今天${p.kind==='qty'?'累计 '+c.sum+' '+esc(p.unit||''):' '+c.pct.toFixed(1)+'%'}</span><span>${mdCN(d1)}</span></div>`;
 }
 function forecastTxt(p,c){
   if(c.pct>=100)return '已全部完成。';const u=p.kind==='qty'?(p.unit||''):'个百分点';const parts=[];
@@ -994,15 +1050,15 @@ function projCard(p){
       <div class="row">${Store.sample?`<button class="btn sm" data-act="aiW" data-id="${p.id}">智能加权（Claude 估算）</button>`:''}<button class="btn sm ghost" data-act="ruleW" data-id="${p.id}">恢复规则权重</button></div>`;
     }else{
       const logs=(p.logs||[]).map((l,i)=>({...l,i})).sort((a,b)=>a.d<b.d?1:-1).slice(0,12);
-      body=`<form class="row" data-sub="qLog" data-p="${p.id}"><label class="f">日期<input class="inp sm" type="date" name="d" value="${today()}" required></label><label class="f">完成数量（${esc(p.unit||'')}）<input class="inp sm num" type="number" name="n" min="0.01" step="any" required style="width:120px"></label><button class="btn sm pri" style="align-self:flex-end">记录进度</button></form>
-      <div class="logs">${logs.map(l=>`<span>${l.d.slice(5)} +${l.n}<button class="x" data-act="qDel" data-p="${p.id}" data-i="${l.i}" aria-label="删除这条记录">×</button></span>`).join('')||'<span class="muted" style="background:none;padding:0">还没有记录。</span>'}</div>`;
+      body=`<form class="row" data-sub="qLog" data-p="${p.id}"><label class="f">日期<input class="inp sm" type="date" name="d" value="${today()}" max="${today()}" required></label><label class="f">完成数量（${esc(p.unit||'')}）<input class="inp sm num" type="number" name="n" min="0.01" step="any" required style="width:120px"></label><button class="btn sm pri" style="align-self:flex-end">记录进度</button></form>
+      <div class="logs">${logs.map(l=>`<span class="${l.d>today()?'fut':''}">${l.d.slice(5)} +${l.n}${l.d>today()?' · 未到':''}<button class="x" data-act="qDel" data-p="${p.id}" data-i="${l.i}" aria-label="删除这条记录">×</button></span>`).join('')||'<span class="muted" style="background:none;padding:0">还没有记录。</span>'}</div>${c.fut?`<p class="small muted" style="margin:0">有 ${c.fut} ${esc(p.unit||'')}记在了还没到的日期，到那天才计入累计；记错了可以点 × 删掉。</p>`:''}`;
     }
     body=`<div class="proj-b"><div>${spark(p,c)}</div><p class="small" style="margin:0">${esc(forecastTxt(p,c))}${c.invested?` 关联事项累计投入 ${fmtMin(c.invested)}。`:''}</p>${p.note?`<p class="small muted" style="margin:0">${esc(p.note)}</p>`:''}${body}
       <div class="row" style="justify-content:flex-end"><button class="btn sm ghost" data-act="pEdit" data-id="${p.id}">编辑项目</button><button class="btn sm ghost" data-act="pArch" data-id="${p.id}">${p.arch?'取消归档':'归档'}</button><button class="btn sm ghost danger" data-act="pDel" data-id="${p.id}">删除</button></div></div>`;
   }
   return `<article class="proj"><button class="proj-h" data-act="pOpen" data-id="${p.id}" aria-expanded="${open}">
     <h3>${esc(p.name)}<span class="tagk">${p.kind==='qty'?'数量累计':'阶段目标'}</span><span class="st ${c.status[0]}">${c.status[1]}</span></h3><span class="pc num">${c.pct.toFixed(c.pct>=100?0:1)}<small>%</small></span>
-    <span class="meta">${p.kind==='qty'?`${c.sum} / ${p.target} ${esc(p.unit||'')}`:`${c.dn}/${c.n} 个小目标`}${p.due?` · 截止 ${mdCN(p.due)}`:''}${c.eta?` · 预计 ${mdCN(c.eta)} 完成`:''}</span>
+    <span class="meta">${p.kind==='qty'?`累计 ${c.sum} / ${p.target} ${esc(p.unit||'')}${c.day?` · 今天 +${c.day}`:''}`:`${c.dn}/${c.n} 个小目标`}${p.due?` · 截止 ${mdCN(p.due)}`:''}${c.eta?` · 预计 ${mdCN(c.eta)} 完成`:''}</span>
     <span class="pbar"><i style="width:${c.pct}%"></i>${c.expect!=null&&c.pct<100?`<u style="left:${c.expect}%" data-tip="按时间匀速推进，今天应到 ${c.expect.toFixed(0)}%"></u>`:''}</span></button>${body}</article>`;
 }
 function vProjects(){
@@ -1231,7 +1287,7 @@ const SUB={
   },
   gAdd(f){const p=findP(f),s=p.stages.find(x=>x.id===f.dataset.s),n=f.n.value.trim();if(!n)return;s.goals.push({id:uid(),name:n,size:2,pct:0});recordHist(p);UI.focus=`[data-fk="g-${s.id}"]`;commit('p-'+p.id)},
   sAdd(f){const p=findP(f),n=f.n.value.trim();if(!n)return;p.stages=p.stages||[];const s={id:uid(),name:n,goals:[]};p.stages.push(s);UI.focus=`[data-fk="g-${s.id}"]`;commit('p-'+p.id)},
-  qLog(f){const p=findP(f),n=+f.n.value;if(!(n>0))return;p.logs=p.logs||[];p.logs.push({d:(f.d&&f.d.value)||f.dataset.date||today(),n});commit('p-'+p.id);const c=projCalc(p);toast(`已记录 +${n} ${p.unit||''}，累计 ${c.sum}（${c.pct.toFixed(1)}%）`)},
+  qLog(f){const p=findP(f),n=+f.n.value;if(!(n>0))return;const d=(f.d&&f.d.value)||f.dataset.date||today();if(d>today()){toast('这一天还没到。做完再记，或把日期改成今天。');return}p.logs=p.logs||[];p.logs.push({d,n});commit('p-'+p.id);const c=projCalc(p),dn=p.logs.filter(l=>l.d===d).reduce((a,l)=>a+l.n,0);toast(`${d===today()?'今天':mdCN(d)}共 +${dn} ${p.unit||''}，累计 ${c.sum}（${c.pct.toFixed(1)}%）`)},
   tagAdd(f){const n=f.n.value.trim();if(!n)return;if(S.meta.tags.some(t=>t.name===n)){toast('已有同名标签');return}const used=S.meta.tags.map(t=>t.c);let c=1;while(used.includes(c)&&c<8)c++;S.meta.tags.push({id:'t'+uid(),name:n,c});commit('meta')},
   rAdd(f){const t=f.t.value.trim();if(!t)return;const days=[...f.querySelectorAll('[name=d]:checked')].map(x=>+x.value);if(!days.length){toast('至少选一天');return}S.meta.routines=S.meta.routines||[];S.meta.routines.push({id:uid(),t,g:f.g.value,plan:Math.max(0,Math.round(+f.plan.value||0)),rm:f.rm.value||'',days,from:today()});commit('meta')},
 };
@@ -1546,7 +1602,7 @@ function buildReport(kind,anchor){
   // 成就 2：长线项目的节点
   for(const p of Object.values(S.projects)){
     const c=projCalc(p);
-    if(p.kind==='qty'){let before=0,inn=0,best=['',0];const byD={};for(const l of p.logs||[]){if(l.d<from)before+=l.n;else if(l.d<=to){inn+=l.n;byD[l.d]=(byD[l.d]||0)+l.n}}if(!inn)continue;const after=before+inn,tg=p.target||1;
+    if(p.kind==='qty'){let before=0,inn=0,best=['',0];const byD={};for(const l of p.logs||[]){if(l.d>td)continue;if(l.d<from)before+=l.n;else if(l.d<=to){inn+=l.n;byD[l.d]=(byD[l.d]||0)+l.n}}if(!inn)continue;const after=before+inn,tg=p.target||1;
       for(const th of[25,50,75,100])if(before/tg*100<th&&after/tg*100>=th)ach.push({t:th===100?`「${p.name}」全部完成`:`「${p.name}」突破 ${th}%`,s:`累计 ${after} / ${p.target} ${p.unit||''}`,big:th===100});
       for(const d in byD)if(byD[d]>best[1])best=[d,byD[d]];
       proj.push({t:`「${p.name}」${per}完成 ${inn} ${p.unit||''}，累计 ${after} / ${p.target}（${Math.min(100,after/tg*100).toFixed(1)}%）`,s:`单日最多 ${best[1]} ${p.unit||''}，${mdCN(best[0])}`})}
@@ -2255,6 +2311,168 @@ Object.assign(ACT,{hintX(el){markSeen(el.dataset.k);const p=el.closest('.modhint
 /* 空的快速输入框不阻塞同步刷新（桌面端刷新后会重新聚焦）；触屏上保持原样，避免收起键盘 */
 function typingInMain(){const a=document.activeElement;if(!(a&&main.contains(a)&&/INPUT|TEXTAREA/.test(a.tagName))||['range','checkbox','radio','date','file'].includes(a.type))return false;if(a.id==='qa'&&!a.value&&matchMedia('(pointer:fine)').matches)return false;return true}
 function addHelpLink(){const sf=document.querySelector('#side .side-foot');if(sf&&!sf.querySelector('[href="#help"]'))sf.insertAdjacentHTML('afterbegin','<a class="lnk" href="#help" style="align-self:flex-start">帮助</a>')}
+
+/* ========== 报告页：分主次、可视化、板块可调顺序 ========== */
+const REP_SECS=[['key','最重要的成果'],['time','时间去向'],['proj','项目进展'],['money','收支'],['score','评分趋势'],['next','下一期留意'],['other','其他记录'],['mine','我的补充'],['mem','写下的话和照片']];
+const REP_HALF={time:1,proj:1,money:1,score:1};
+function repOrder(){const all=REP_SECS.map(s=>s[0]),o=(Array.isArray(S.meta.repOrder)?S.meta.repOrder:[]).filter((k,i,a)=>all.includes(k)&&a.indexOf(k)===i);for(const k of all)if(!o.includes(k))o.push(k);return o}
+/* 一期里的刻度：周、月按天，年按月 */
+function repSlots(R){const td=today();
+  if(R.kind==='year'){const y=R.from.slice(0,4);return[...Array(12)].map((_,m)=>{const a=y+'-'+pad(m+1)+'-01',[,b]=rangeOf('month',a);return{a,b,label:(m+1)+'月',name:(m+1)+'月',act:'goMonth',fut:a>td,cur:ymOf(td)===ymOf(a)}})}
+  const n=diffDays(R.from,R.to)+1;return[...Array(n)].map((_,i)=>{const d=addDays(R.from,i);return{a:d,b:d,label:R.kind==='week'?'周'+WD[parse(d).getDay()]:String(parse(d).getDate()),name:mdCN(d),act:'goDay',fut:d>td,cur:d===td}})}
+function repBars(slots,vals){const mx=Math.max(0,...vals.map(x=>x.v)),n=slots.length,gc=`grid-template-columns:repeat(${n},minmax(0,1fr))`;
+  return `<div class="rbars" style="${gc}">${slots.map((s,i)=>{const x=vals[i];return `<button class="${s.fut?'fut':''}" data-act="${s.act}" data-d="${s.a}" data-tip="${esc(x.tip)}" aria-label="${esc(x.tip)}"><span class="st" style="height:${mx?x.v/mx*100:0}%">${(x.parts||[['var(--accent)',1]]).map(([c,v])=>`<i style="flex:${v} 0 0;background:${c}"></i>`).join('')}</span></button>`}).join('')}</div>`+
+  (n<=12?`<div class="rbl" style="${gc}">${slots.map(s=>`<span class="${s.cur?'cur':''}">${s.label}</span>`).join('')}</div>`:`<div class="tl-ax"><span>${slots[0].label} 日</span><span>${slots[Math.floor(n/2)].label} 日</span><span>${slots[n-1].label} 日</span></div>`)}
+function donut(parts,center,sub){const tot=parts.reduce((a,p)=>a+p[1],0)||1,r=42,C=2*Math.PI*r;let off=0;
+  return `<svg class="donut" viewBox="0 0 120 120" role="img" aria-label="${esc(sub||'')}占比"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="14"/>${parts.map(([c,v])=>{const len=v/tot*C,vis=Math.max(0,len-(parts.length>1?1.5:0)),h=`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${c}" stroke-width="14" stroke-dasharray="${vis.toFixed(2)} ${(C-vis).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 60 60)"/>`;off+=len;return h}).join('')}<text x="60" y="${sub?59:64}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">${esc(center)}</text>${sub?`<text x="60" y="73" text-anchor="middle" font-size="9" fill="var(--ink2)">${esc(sub)}</text>`:''}</svg>`}
+function repTime(R){const st=R.st;if(!st.min)return'';const slots=repSlots(R),ids=seriesTags();
+  const vals=slots.map(s=>{let min=0,by={};if(R.kind==='year'){const c=calc(s.a,s.b);min=c.min;by=c.byTag}else{const x=st.byDay[s.a];if(x){min=x.min;by=x.byTag}}return{v:min,parts:ids.filter(g=>by[g]).map(g=>[tagColor(g),by[g]]),tip:`${s.name} ${min?fmtMin(min):s.fut?'还没到':'未记录'}`}});
+  return `<section class="card rsec"><h2>时间去向 <small>共 ${fmtMin(st.min)}</small></h2>${repBars(slots,vals)}<div style="margin-top:14px">${tagBars(st)}</div></section>`}
+function repProj(R){const td=today(),rows=[],idle=[];
+  for(const p of Object.values(S.projects)){if((p.start||'')>R.to)continue;let p0=0,p1=0,sub='';
+    if(p.kind==='qty'){let b=0,inn=0;for(const l of p.logs||[]){if(l.d>td||l.d>R.to)continue;if(l.d<R.from)b+=l.n;else inn+=l.n}if(!inn){if(!p.arch)idle.push(p.name);continue}const tg=p.target||1;p0=Math.min(100,b/tg*100);p1=Math.min(100,(b+inn)/tg*100);sub=`${REP_CN[R.kind][1]} +${inn} ${p.unit||''} · 累计 ${b+inn} / ${p.target}`}
+    else{const h=p.hist||{},ks=Object.keys(h).sort(),at=d=>{let v=0;for(const k of ks){if(k<=d)v=h[k];else break}return v},f0=parse(R.from).getTime(),f1=parse(R.to).getTime()+864e5;let n=0;
+      p0=at(addDays(R.from,-1));p1=R.to>=td?projCalc(p).pct:at(R.to);for(const s of p.stages||[])for(const g of s.goals||[])if((g.pct||0)>=100&&g.at>=f0&&g.at<f1)n++;
+      if(p1-p0<=.05&&!n){if(!p.arch)idle.push(p.name);continue}sub=n?`完成 ${n} 个小目标`:''}
+    rows.push({p,p0,p1,g:Math.max(0,p1-p0),sub})}
+  if(!rows.length&&!idle.length)return'';rows.sort((a,b)=>b.g-a.g);
+  return `<section class="card rsec"><h2>项目进展${rows.length?' <small>深色是这一期推进的部分</small>':''}</h2>${rows.map(r=>`<div class="rpj"><div class="rpj-h"><b>${esc(r.p.name)}</b><span class="num"><em>+${r.g.toFixed(1)}</em>${r.p1.toFixed(1)}%</span></div><div class="pb"><i style="width:${Math.min(r.p0,r.p1)}%"></i><i class="g" style="width:${r.g}%"></i></div>${r.sub?`<small>${esc(r.sub)}</small>`:''}</div>`).join('')}${idle.length?`<p class="small muted" style="margin:${rows.length?'10px':'0'} 0 0">这一期没有进展：${esc(idle.join('、'))}</p>`:''}</section>`}
+function repMoney(R){const mo=calcMoney(R.from,R.to);if(!mo.list.length)return'';const td=today(),ended=R.to<td,[pf,pt]=rangeOf(R.kind,shift(R.kind,R.from,-1)),pm=calcMoney(pf,pt),net=mo.inc-mo.out;
+  const cs=Object.entries(mo.byCat).sort((a,b)=>b[1]-a[1]),parts=cs.slice(0,5).map(([id,v])=>[catColor(id),v,catName(id)]),rest=cs.slice(5).reduce((a,x)=>a+x[1],0);if(rest)parts.push(['var(--ink2)',rest,'其他']);
+  const slots=repSlots(R),vals=slots.map(s=>{let v=0;if(R.kind==='year'){for(const d in mo.byDay)if(d>=s.a&&d<=s.b)v+=mo.byDay[d]}else v=mo.byDay[s.a]||0;return{v,tip:`${s.name} ${s.fut?'还没到':v?'支出 '+fmtY(v):'没有支出记录'}`}}),mx=Math.max(0,...vals.map(x=>x.v));
+  const bg=mo.list.filter(b=>b.k!=='in').sort((a,b)=>b.amt-a.amt)[0],bud=R.kind==='month'?+S.meta.budget||0:0,nt=[];
+  if(bg)nt.push(`最大一笔是 ${mdCN(bg.d)} 的${catName(bg.cat)}${bg.note?'·'+bg.note:''} ${fmtY(bg.amt)}`);if(ended&&pm.out)nt.push(`支出比${REP_CN[R.kind][2]}${mo.out>=pm.out?'多':'少'} ${Math.abs(Math.round((mo.out-pm.out)/pm.out*100))}%`);if(bud)nt.push(`已用月预算的 ${Math.round(mo.out/bud*100)}%`);
+  return `<section class="card rsec"><h2>收支</h2><div class="rtiles"><div class="in"><span>收入</span><b>${fmtY(mo.inc)}</b></div><div class="out"><span>支出</span><b>${fmtY(mo.out)}</b></div><div><span>结余</span><b>${fmtY(net)}</b></div></div>
+  ${mo.out?`<h3>${R.kind==='year'?'每月':'每日'}支出 <small>最高 ${fmtY(mx)}</small></h3>${repBars(slots,vals)}<h3 style="margin-top:14px">支出分类</h3><div class="rdon">${donut(parts,fmtY(mo.out),'支出')}<div class="grow">${parts.map(([c,v,n])=>`<div class="tagrow"><span class="nm"><i class="dot" style="background:${c}"></i>${esc(n)}</span><span class="bar"><i style="width:${v/parts[0][1]*100}%;background:${c}"></i></span><span class="v">${fmtY(v)}</span><span class="p">${Math.round(v/mo.out*100)}%</span></div>`).join('')}</div></div>`:''}
+  ${nt.length?`<p class="small muted" style="margin:10px 0 0">${esc(nt.join('；'))}。</p>`:''}</section>`}
+function repScore(R){const td=today(),end=R.to<td?R.to:td,s=end>=R.from?scoreStats(R.from,end):null;if(!s)return'';
+  const[pf,pt]=rangeOf(R.kind,shift(R.kind,R.from,-1)),p=scoreStats(pf,pt),slots=repSlots(R),n=slots.length,W=560,H=132,x=i=>n>1?30+i/(n-1)*(W-44):W/2,y=v=>H-14-v/100*(H-30),pts=[];
+  slots.forEach((sl,i)=>{const ds=s.days.filter(q=>q.d>=sl.a&&q.d<=sl.b);if(ds.length)pts.push({i,v:ds.reduce((a,q)=>a+q.total,0)/ds.length,lab:sl.name})});
+  const line=pts.map(q=>`${x(q.i).toFixed(1)},${y(q.v).toFixed(1)}`).join(' ');
+  const svg=`<svg class="rline" viewBox="0 0 ${W} ${H}" role="img" aria-label="总分走势">${[0,50,100].map(v=>`<line x1="30" x2="${W-14}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" ${v?'stroke-dasharray="3 4"':''}/><text x="24" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--ink2)">${v}</text>`).join('')}${pts.length>1?`<polygon points="${x(pts[0].i).toFixed(1)},${y(0)} ${line} ${x(pts[pts.length-1].i).toFixed(1)},${y(0)}" fill="rgba(var(--accent-rgb),.12)"/><polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`:''}${pts.map(q=>`<circle cx="${x(q.i).toFixed(1)}" cy="${y(q.v).toFixed(1)}" r="3.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.5"><title>${esc(q.lab)} ${Math.round(q.v)} 分</title></circle>`).join('')}</svg>
+  <div class="tl-ax" style="padding-left:5%"><span>${slots[0].name}</span><span>没有圆点的${R.kind==='year'?'月份':'日期'}是没打分</span><span>${slots[n-1].name}</span></div>`;
+  const rows=s.dims.map(dm=>{const pd=p&&p.dims.find(q=>q.id===dm.id),df=pd?dm.avg-pd.avg:0,sh=pd&&Math.abs(df)>=.2;return `<div class="tagrow"><span class="nm">${esc(dm.name)}</span><span class="bar"><i style="width:${dm.avg/5*100}%;background:var(--accent)"></i></span><span class="v">${dm.avg.toFixed(1)} / 5</span><span class="p" style="color:${sh?(df>0?'var(--good)':'var(--bad)'):'inherit'}">${sh?(df>0?'↑':'↓')+Math.abs(df).toFixed(1):''}</span></div>`}).join('');
+  const ex=(R.score?R.score.lines:[]).filter(l=>/^最高|^后半段/.test(l));
+  return `<section class="card rsec"><h2>评分趋势 <small>日均 ${Math.round(s.avg)} 分 · 打分 ${s.days.length} 天${p?` · ${REP_CN[R.kind][2]} ${Math.round(p.avg)} 分`:''}</small></h2>${svg}<div style="margin-top:12px">${rows}</div>${ex.length?`<p class="small muted" style="margin:8px 0 0">${esc(ex.join('；'))}。</p>`:''}</section>`}
+function repNext(R){const tips=R.score&&modOn('score')?R.score.tips:[],ls=a=>a.map(t=>({t}));if(!R.miss.length&&!tips.length)return'';
+  return `<section class="card rsec"><h2>下一期留意</h2><div class="${R.miss.length&&tips.length?'rcols':''}">${R.miss.length?`<div><h3>待改进</h3>${hlList(R.miss,'')}</div>`:''}${tips.length?`<div><h3>小提醒</h3>${hlList(ls(tips),'')}</div>`:''}</div></section>`}
+function repOther(R){const a=[];
+  if(R.ev.length)a.push(`<div><h3>其他值得记的</h3>${hlList(R.ev,'')}</div>`);
+  if(R.top.length)a.push(`<div><h3>投入最多的事</h3>${R.top.map(([k,e])=>`<div class="actrow"><span class="nm"><i class="dot" style="background:${tagColor(e.g)}"></i><span>${esc(k)}</span></span><span class="n">${e.n} 次</span><span class="num">${e.min?fmtMin(e.min):'—'}</span></div>`).join('')}</div>`);
+  if(R.foot&&R.foot.length)a.push(`<div class="w2"><h3>逐月足迹</h3>${R.foot.map(f=>`<div class="foot-m"><b class="num">${f.m} 月</b><span>${f.top?'主要在做「'+esc(f.top)+'」':'<span class="muted">没有记录用时</span>'}</span><span class="num muted">完成 ${f.done} 件</span><span class="num">${fmtH(f.min)}</span></div>`).join('')}</div>`);
+  return a.length?`<section class="card rsec rminor"><h2>其他记录</h2><div class="${a.length>1?'rcols':''}">${a.join('')}</div></section>`:''}
+function repMem(R){if(!modOn('note')||(!R.notes.length&&!R.pics.length))return'';const open=FOLD_ALL||FOLD['r-mem'],pics=R.pics.slice(-60);
+  return `<section class="card rsec" data-fold="r-mem"><h2>写下的话和照片 <small>${R.notes.length} 篇小结 · ${R.pics.length} 张照片</small></h2>${R.notes.map(n=>`<div class="rnote"><button class="lnk num" data-act="goDay" data-d="${n.d}">${mdCN(n.d)}</button><span>${esc(n.t.length>240?n.t.slice(0,240)+'…':n.t)}</span></div>`).join('')}${pics.length?`<div class="pics" style="margin-top:12px">${pics.map(p=>`<button class="ph" data-act="picOpen" data-id="${p.id}" aria-label="查看 ${mdCN(p.d)} 的照片"><img ${open?'data-pic':'data-pic-lazy'}="${p.id}" ${Pics.ready[p.id]?`src="${Pics.ready[p.id]}"`:''} alt="${mdCN(p.d)} 的照片" loading="lazy"></button>`).join('')}</div>${R.pics.length>60?`<p class="small muted" style="margin:8px 0 0">只显示最近 60 张，其余在各天的页面里。</p>`:''}`:''}</section>`}
+function repOrderPanel(){const o=repOrder(),nm=Object.fromEntries(REP_SECS);
+  return `<section class="card ordp"><h2>调整板块顺序<span class="sp" style="flex:1"></span><button class="btn sm ghost" data-act="repOrdReset">恢复默认</button><button class="btn sm pri" data-act="repEdit">完成</button></h2><p class="small muted" style="margin:0 0 8px">点 ↑ ↓ 移动，电脑上也可以直接拖。顶部的总结固定在最前；这一期没有内容的板块不会显示。</p>${o.map((k,i)=>`<div class="ordrow" draggable="true" data-k="${k}"><span class="grip" aria-hidden="true">≡</span><span class="nm">${nm[k]}</span><button class="btn sm" data-act="repMv" data-k="${k}" data-n="-1" ${i?'':'disabled'} aria-label="上移${nm[k]}">↑</button><button class="btn sm" data-act="repMv" data-k="${k}" data-n="1" ${i<o.length-1?'':'disabled'} aria-label="下移${nm[k]}">↓</button></div>`).join('')}</section>`}
+vReport=function(){const R=buildReport(UI.rep,UI.date),st=R.st;
+  const seg=`<span class="seg" role="group" aria-label="报告类型">${['week','month','year'].map(k=>`<button data-act="repKind" data-k="${k}" aria-pressed="${UI.rep===k}">${REP_CN[k][0]}</button>`).join('')}</span>`;
+  const S2={key:`<section class="card rsec keyres"><h2>最重要的成果</h2>${hlList(R.ach,'这一期还没有重要成果。标了 ★ 并做完的事、长线项目的节点会出现在这里。')}</section>`,
+    time:repTime(R),proj:modOn('proj')?repProj(R):'',money:modOn('money')?repMoney(R):'',score:modOn('score')?repScore(R):'',next:repNext(R),other:repOther(R),
+    mine:`<section class="card rsec"><h2>我的补充 <small>自动保存，会一起导出</small></h2><textarea class="inp" data-inp="repMine" aria-label="我的补充" placeholder="这一期最想记住的事、下一期想调整的地方…">${esc(R.mine)}</textarea></section>`,mem:repMem(R)};
+  const vis=repOrder().filter(k=>S2[k]);let body='';
+  for(let i=0;i<vis.length;i++){const k=vis[i],nx=vis[i+1];if(REP_HALF[k]&&nx&&REP_HALF[nx]){body+=`<div class="grid2">${S2[k]}${S2[nx]}</div>`;i++}else body+=S2[k]}
+  const none=[];if(!st.min)none.push('用时');if(modOn('money')&&!S2.money)none.push('收支');if(modOn('score')&&!S2.score)none.push('评分');
+  return `<div class="row">${seg}<span class="sp" style="flex:1"></span>${Store.sample?`<button class="btn sm" data-act="repAI">让 Claude 润色总结</button>`:''}<button class="btn sm" data-act="repCopy">复制为文字</button></div>
+  ${UI.repEdit?repOrderPanel():''}
+  <section class="card rep-top"><p class="rep-narr">${esc(R.ai||R.narr)}</p>${R.ai?`<div class="small muted" style="margin-top:8px">由 Claude 根据下面的数据改写。<button class="lnk" data-act="repAIClear">恢复自动总结</button></div>`:''}
+    <div class="rk"><div><span>完成事项</span><b>${st.done}<small>/ ${st.all}</small></b>${R.open?'<em>这一期还没结束</em>':delta(st.done,R.pv.done)}</div><div><span>完成率</span><b>${R.rate}<small>%</small></b><div class="meter"><i style="width:${R.rate}%"></i></div></div><div><span>记录用时</span><b>${fmtH(st.min)}</b>${R.open?`<em>上一期共 ${fmtH(R.pv.min)}</em>`:delta(st.min,R.pv.min)}</div><div><span>有记录的天数</span><b>${st.active}<small>天</small></b><em>活跃日均 ${fmtH(st.active?st.min/st.active:0)}</em></div></div></section>
+  ${body}
+  ${none.length?`<p class="small muted" style="margin:0;padding:0 4px">这一期没有记录：${none.join('、')}。</p>`:''}
+  ${UI.repEdit?'':`<p class="small" style="margin:0;text-align:center"><button class="lnk" data-act="repEdit" style="color:var(--ink2)">调整板块顺序</button></p>`}`};
+Object.assign(ACT,{repEdit(){UI.repEdit=!UI.repEdit;render(true);if(UI.repEdit)main.scrollTop=0},
+  repMv(el){const o=repOrder(),i=o.indexOf(el.dataset.k),j=i+(+el.dataset.n);if(i<0||j<0||j>=o.length)return;[o[i],o[j]]=[o[j],o[i]];S.meta.repOrder=o;commit('meta')},
+  repOrdReset(){S.meta.repOrder=[];commit('meta')}});
+document.addEventListener('dragstart',e=>{const r=e.target.closest&&e.target.closest('.ordrow');if(!r)return;UI.dragK=r.dataset.k;r.classList.add('drag');try{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',r.dataset.k)}catch(_){}});
+document.addEventListener('dragover',e=>{if(UI.dragK&&e.target.closest&&e.target.closest('.ordrow'))e.preventDefault()});
+document.addEventListener('drop',e=>{const r=e.target.closest&&e.target.closest('.ordrow');if(!r||!UI.dragK)return;e.preventDefault();const o=repOrder(),k=UI.dragK,a=o.indexOf(k),b=o.indexOf(r.dataset.k);UI.dragK=null;if(a<0||b<0||a===b)return;o.splice(a,1);o.splice(b,0,k);S.meta.repOrder=o;commit('meta')});
+document.addEventListener('dragend',()=>{UI.dragK=null;document.querySelectorAll('.ordrow.drag').forEach(x=>x.classList.remove('drag'))});
+/* 照片在展开「写下的话和照片」时才加载 */
+document.addEventListener('click',e=>{const h=e.target.closest&&e.target.closest('[data-fold=r-mem]>h2');if(!h)return;const s=h.parentNode;if(!s.classList.contains('open'))return;s.querySelectorAll('img[data-pic-lazy]').forEach(i=>{i.dataset.pic=i.dataset.picLazy;i.removeAttribute('data-pic-lazy')});hydratePics(s)});
+{const _r=render;render=function(f){_r(f);try{if(UI.view!=='report'){UI.repEdit=false;return}const hm=main.querySelector('.hmore .hmenu');if(hm&&!hm.querySelector('[data-act=repEdit]'))hm.insertAdjacentHTML('beforeend','<button class="hbtn" data-act="repEdit">调整板块</button>')}catch(e){console.error(e)}}}
+
+/* ========== 数据迁移：导出一份规整、通用的数据包 ========== */
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u){let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC_T[(c^u[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+function zipBlob(files){const enc=new TextEncoder(),parts=[],cen=[],D=new Date(),dt=((D.getFullYear()-1980)<<9)|((D.getMonth()+1)<<5)|D.getDate(),tm=(D.getHours()<<11)|(D.getMinutes()<<5)|(D.getSeconds()>>1);let off=0;
+  for(const f of files){const nm=enc.encode(f.name),crc=crc32(f.data),n=f.data.length,h=new DataView(new ArrayBuffer(30)),c=new DataView(new ArrayBuffer(46));
+    h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(10,tm,true);h.setUint16(12,dt,true);h.setUint32(14,crc,true);h.setUint32(18,n,true);h.setUint32(22,n,true);h.setUint16(26,nm.length,true);
+    c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(12,tm,true);c.setUint16(14,dt,true);c.setUint32(16,crc,true);c.setUint32(20,n,true);c.setUint32(24,n,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
+    parts.push(new Uint8Array(h.buffer),nm,f.data);cen.push(new Uint8Array(c.buffer),nm);off+=30+nm.length+n}
+  let cs=0;for(const x of cen)cs+=x.length;const e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:'application/zip'})}
+function exportData(){const iso=ms=>ms?new Date(ms).toISOString():null,tagN=g=>g&&tagOf(g)?tagName(g):'',dims=dimsOf(),WK=['周日','周一','周二','周三','周四','周五','周六'];
+  const E={format:'four-seasons-journal',version:1,exported_at:new Date().toISOString(),timezone:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||''}catch(e){return''}})(),currency:S.meta.cur||'¥',monthly_budget:+S.meta.budget||0,
+    tags:(S.meta.tags||[]).map(t=>({id:t.id,name:t.name})),categories:(S.meta.cats||DEF_CATS()).map(c=>({id:c.id,name:c.name,type:c.k==='in'?'income':'expense'})),score_dimensions:dims.map(d=>({id:d.id,name:d.name})),
+    tasks:[],time_logs:[],bills:[],day_scores:[],notes:[],photos:[],projects:[],
+    routines:(S.meta.routines||[]).map(r=>({id:r.id,title:r.t,tag:tagN(r.g),weekdays:(r.days||[]).map(d=>WK[d]),planned_minutes:+r.plan||0,reminder:r.rm||''})),
+    parked_tasks:parkedOf().map(p=>({title:p.t,tag:tagN(p.g),planned_minutes:+p.plan||0})),
+    focus_periods:focusList().map(f=>({name:f.name,from:f.from,to:f.to,weights:Object.fromEntries(dims.filter(d=>f.w&&f.w[d.id]!=null).map(d=>[d.name,+f.w[d.id]]))})),
+    report_notes:Object.entries(S.meta.reports||{}).filter(([,v])=>v&&v.t).map(([k,v])=>({period:k,text:v.t}))};
+  for(const ym of Object.keys(S.months).sort()){const M=S.months[ym];
+    for(const t of Object.values(M.tasks||{}).filter(t=>!t.del).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:(a.c||0)-(b.c||0))){const pj=t.pid&&S.projects[t.pid];
+      E.tasks.push({id:t.id,date:t.d,title:t.t||'',tag:tagN(t.g),done:!!t.done,completed_at:t.done?iso(t.at):null,planned_minutes:+t.plan||0,spent_minutes:tmin(t),starred:!!t.star,unplanned:!!t.adhoc,postponed_times:+t.mv||0,project:pj?pj.name:'',reminder:t.rm||'',from_routine:!!t.rid,created_at:iso(t.c),updated_at:iso(t.u)});
+      for(const l of t.logs||[])E.time_logs.push({task_id:t.id,date:t.d,title:t.t||'',tag:tagN(t.g),start:iso(l.s),minutes:+l.m||0})}
+    for(const b of Object.values(M.bills||{}).filter(b=>!b.del).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:(a.c||0)-(b.c||0)))E.bills.push({id:b.id,date:b.d,type:b.k==='in'?'income':'expense',amount:+b.amt||0,category:catName(b.cat),note:b.note||'',created_at:iso(b.c)});
+    for(const d of Object.keys(M.scores||{}).sort()){const e=M.scores[d];if(!e||e.del)continue;const sc=dayScore(d),sl=sleepHours(e);if(!sc&&sl==null)continue;E.day_scores.push({date:d,total:sc?sc.total:null,scores:Object.fromEntries(dims.map(dm=>[dm.name,sc&&sc.v[dm.id]||null])),bedtime:e.bed||'',wake_time:e.wake||'',sleep_hours:sl==null?null:Math.round(sl*10)/10})}
+    for(const d of Object.keys(M.notes||{}).sort()){const n=M.notes[d];if(n&&(n.t||'').trim())E.notes.push({date:d,text:n.t.trim()})}
+    for(const p of Object.values(M.pics||{}).filter(p=>!p.del).sort((a,b)=>a.d<b.d?-1:1))E.photos.push({id:p.id,date:p.d,file:'',width:p.w||null,height:p.h||null})}
+  for(const p of Object.values(S.projects).sort((a,b)=>(a.c||0)-(b.c||0))){const c=projCalc(p),o={id:p.id,name:p.name||'',type:p.kind==='qty'?'quantity':'milestones',start:p.start||'',due:p.due||'',archived:!!p.arch,progress_percent:Math.round(c.pct*10)/10,note:p.note||'',reminder:p.rm||''};
+    if(p.kind==='qty'){o.unit=p.unit||'';o.target=+p.target||0;o.done_amount=c.sum;o.logs=(p.logs||[]).slice().sort((a,b)=>a.d<b.d?-1:1).map(l=>({date:l.d,amount:l.n}))}
+    else{o.stages=(p.stages||[]).map(s=>({name:s.name,goals:(s.goals||[]).map(g=>({name:g.name,size:SIZE[g.size||2],weight:Math.round(goalW(g)*10)/10,percent:+g.pct||0,completed_at:(g.pct||0)>=100?iso(g.at):null}))}));o.history=Object.keys(p.hist||{}).sort().map(d=>({date:d,percent:p.hist[d]}))}
+    E.projects.push(o)}
+  return E}
+function toCsv(rows,cols){const q=v=>{if(v==null)return'';if(typeof v==='boolean')v=v?'是':'否';v=String(v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};return '﻿'+[cols.map(c=>c[1]).join(','),...rows.map(r=>cols.map(c=>q(typeof c[0]==='function'?c[0](r):r[c[0]])).join(','))].join('\r\n')+'\r\n'}
+const EX_README=`四季手账 · 数据迁移包
+======================
+
+这个压缩包是你在「四季手账」里全部记录的一份完整拷贝，整理成了通用格式：
+不依赖这个软件也能读，方便以后搬到别的软件、小程序，或者自己用 Excel 分析。
+
+文件说明
+--------
+data.json          全部数据，一个文件。字段名是完整的英文单词，日期是 YYYY-MM-DD，时间点是 ISO 8601（UTC）。
+                   给程序读用这个：结构最完整。
+tasks.csv          事项：每行一件事（日期、标题、标签、是否完成、完成时间、计划分钟、实际分钟、是否重点、是否计划外、顺延次数、所属项目）
+time_logs.csv      计时记录：每行一段用时（属于哪件事、开始时间、分钟数）
+bills.csv          账目：每行一笔（日期、收入/支出、金额、分类、备注）
+day_scores.csv     每日打分：每行一天（总分 0–100、各维度 1–5 分、几点睡、几点起、睡眠小时数）
+notes.csv          每日小结：每行一天
+projects.csv       长线项目：每行一个项目（类型、起止、目标、当前进度）
+project_logs.csv   数量累计型项目的每次记录（日期、数量）
+project_goals.csv  阶段目标型项目的阶段和小目标（权重、完成度、完成时间）
+photos.csv         照片清单；选了「包含照片」时，原图在 photos/ 文件夹里，文件名是「日期_编号」
+backup.json        本软件自己的备份格式。想把数据装回「四季手账」，在「设置 → 数据 → 导入备份并合并」里选它。
+
+约定
+----
+- CSV 是 UTF-8 编码（带 BOM），Excel、Numbers、WPS 可以直接打开。
+- 空着的格子表示「没有记录」，不是 0。
+- 总分的算法：每个维度 1–5 分折算成 0–100（1 分 = 0，5 分 = 100），再按权重平均。
+- 删除过的记录不在包里。
+- data.json 顶层的 format / version 标明了格式版本，以后格式有变化会升版本号。
+`;
+async function exportAll(withPics){const E=exportData(),enc=new TextEncoder(),files=[],add=(name,text)=>files.push({name,data:enc.encode(text)}),ymdhm=s=>s?(d=>`${ymd(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}`)(new Date(s)):'';
+  let got=0,miss=0;
+  if(withPics&&E.photos.length&&Store.pics){toast(`正在打包 ${E.photos.length} 张照片…`);
+    for(const ph of E.photos){try{const p=findPic(ph.id),u=p&&await Pics.url(p);if(!u)throw 0;const b=await(await fetch(u)).blob(),ext=/png/.test(b.type)?'png':/webp/.test(b.type)?'webp':/gif/.test(b.type)?'gif':'jpg';ph.file=`photos/${ph.date}_${ph.id}.${ext}`;files.push({name:ph.file,data:new Uint8Array(await b.arrayBuffer())});got++}catch(e){miss++}}}
+  add('README.txt',EX_README.replace(/\n/g,'\r\n'));add('data.json',JSON.stringify(E,null,2));
+  add('tasks.csv',toCsv(E.tasks,[['date','日期'],['title','标题'],['tag','标签'],['done','已完成'],[r=>ymdhm(r.completed_at),'完成时间'],['planned_minutes','计划分钟'],['spent_minutes','实际分钟'],['starred','重点'],['unplanned','计划外'],['postponed_times','顺延次数'],['project','所属项目'],['reminder','提醒时间'],['id','编号']]));
+  add('time_logs.csv',toCsv(E.time_logs,[['date','日期'],['title','事项'],['tag','标签'],[r=>ymdhm(r.start),'开始时间'],['minutes','分钟'],['task_id','事项编号']]));
+  add('bills.csv',toCsv(E.bills,[['date','日期'],[r=>r.type==='income'?'收入':'支出','类型'],['amount','金额'],['category','分类'],['note','备注'],['id','编号']]));
+  add('day_scores.csv',toCsv(E.day_scores,[['date','日期'],['total','总分'],...E.score_dimensions.map(d=>[r=>r.scores[d.name],d.name]),['bedtime','入睡'],['wake_time','起床'],['sleep_hours','睡眠小时']]));
+  add('notes.csv',toCsv(E.notes,[['date','日期'],['text','小结']]));
+  add('projects.csv',toCsv(E.projects,[['name','项目'],[r=>r.type==='quantity'?'数量累计':'阶段目标','类型'],['start','开始'],['due','截止'],['progress_percent','进度%'],['target','目标总量'],['done_amount','已完成量'],['unit','单位'],['archived','已归档'],['note','备注'],['id','编号']]));
+  add('project_logs.csv',toCsv(E.projects.filter(p=>p.logs).flatMap(p=>p.logs.map(l=>({project:p.name,unit:p.unit,...l}))),[['project','项目'],['date','日期'],['amount','数量'],['unit','单位']]));
+  add('project_goals.csv',toCsv(E.projects.filter(p=>p.stages).flatMap(p=>p.stages.flatMap(s=>s.goals.map(g=>({project:p.name,stage:s.name,...g})))),[['project','项目'],['stage','阶段'],['name','小目标'],['size','大小'],['weight','权重'],['percent','完成度%'],[r=>ymdhm(r.completed_at),'完成时间']]));
+  add('photos.csv',toCsv(E.photos,[['date','日期'],['file','文件'],['width','宽'],['height','高'],['id','编号']]));
+  add('backup.json',JSON.stringify({app:'四季手账',at:new Date().toISOString(),meta:S.meta,months:S.months,projects:S.projects}));
+  const blob=zipBlob(files),name=`四季手账-迁移包-${today()}.zip`;
+  if(Store.host==='web')webSave(name,blob);else if(Store.downloads){try{await Store.downloads.save({filename:name,data:blob})}catch(e){if(e&&e.code!=='declined')toast('保存没有成功');return}}else{toast('这里不能直接下载文件，请在网页版里导出');return}
+  toast(`迁移包已导出：${E.tasks.length} 件事、${E.bills.length} 笔账${withPics?`、${got} 张照片${miss?`（${miss} 张没取到）`:''}`:''}`)}
+Object.assign(ACT,{exportAll(el){if(el.disabled)return;el.disabled=true;const c=$('#ex-pics');exportAll(!!(c&&c.checked)).catch(e=>{console.error(e);toast('导出没有成功')}).finally(()=>{el.disabled=false})}});
+{const _vp=vPrefs;vPrefs=function(){return _vp().replace('<section class="card"><h2>数据</h2><div class="row">','<section class="card"><h2>数据 <small>备份与迁移</small></h2><div class="row" style="margin-bottom:10px"><button class="btn sm pri" data-act="exportAll">导出迁移包（ZIP）</button><label class="row small" style="gap:6px"><input type="checkbox" id="ex-pics" style="margin:0">包含照片</label></div><p class="small muted" style="margin:0 0 10px">迁移包把全部记录整理成通用格式：可以用 Excel 打开的 CSV 表格、一份带字段说明的 JSON，以及能装回本软件的备份。以后想换软件，或者自己分析数据，都用它。</p><div class="row">')}}
+HELP.push(['数据迁移与备份',['「设置 → 数据 → 导出迁移包」会生成一个 ZIP：事项、计时、账目、打分、小结、项目各一张 CSV 表，外加一份完整的 data.json 和字段说明。','勾选「包含照片」会把原图一起放进去，照片多时文件会比较大。','包里的 backup.json 可以用「导入备份并合并」装回来；合并时同一条记录以较新的为准。','建议每隔一段时间导出一次，自己留一份。']]);
 
 boot();
 </script>
