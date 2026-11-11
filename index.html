@@ -394,6 +394,42 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--in
 }
 .bill button.nm{text-align:left}
 .bill button.nm:hover{color:var(--accent)}
+/* 简洁版：更少的框、更少的颜色、默认不动 */
+:root:not([data-fx="on"]) #bgfx,:root:not([data-fx="on"]) .hero canvas{display:none}
+#side{width:184px}
+.card,.kpi,.proj{box-shadow:none}
+.hero{min-height:0;padding:16px 20px;box-shadow:none}
+.hero::after,.hero .seal{display:none}
+.hero .big{font-size:clamp(46px,8vw,62px)}
+.hero .big.txt{font-size:clamp(28px,5vw,36px)}
+.sum{gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.sum .kpi{background:none;border:0;border-radius:0;-webkit-backdrop-filter:none;backdrop-filter:none;border-left:1px solid var(--line)}
+.sum .kpi:first-child{border-left:0}
+@media (max-width:720px){.sum .kpi:nth-child(odd){border-left:0}.sum .kpi:nth-child(n+3){border-top:1px solid var(--line)}}
+.sum.flat{border:0;background:none;border-radius:0}
+.sum.flat .kpi{padding-left:0}
+.sum.flat .kpi+.kpi{padding-left:14px}
+@supports (background:color-mix(in srgb,red 50%,transparent)){.sum{background:color-mix(in srgb,var(--surface) var(--glass),transparent)}.sum.flat{background:none}}
+.its li{border-left:0;padding-left:0}
+.qa .more{display:none}
+.qa:focus-within .more{display:flex}
+.dsum{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;font-size:13px;color:var(--ink2);padding:0 4px}
+.dsum b{color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums}
+.dsum .meter{flex:1;min-width:90px;margin:0}
+.tcard{padding:12px 16px}
+.tcard .tclock{font-size:22px;font-weight:700}
+.tcard .btn svg{width:11px;height:11px}
+.play{width:auto;height:28px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600}
+.play::after{content:"计时"}
+.play.on::after{content:"停止"}
+.t-meta>span:nth-child(n+4){display:none}
+.calseg{margin:-4px 0}
+.fold>h2{cursor:pointer;margin-bottom:0;-webkit-user-select:none;user-select:none}
+.fold.open>h2{margin-bottom:12px}
+.fold:not(.open)>*:not(h2){display:none!important}
+.fold>h2::after{content:"";margin-left:auto;width:7px;height:7px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s;flex:none}
+.fold.open>h2::after{transform:rotate(-135deg) translate(-2px,-2px)}
+.fold>h2 .sp{flex:0}
 </style>
 </head>
 <body>
@@ -1015,7 +1051,7 @@ const ACT={
   async authSignUp(el){const f=el.closest('form'),email=f.elements.email.value.trim(),pw=f.elements.pw.value;UI.auth.email=email;if(!email||pw.length<6){authMsg('请填写邮箱和至少 6 位的密码');return}el.disabled=true;
     try{const{data,error}=await Store.sb.auth.signUp({email,password:pw,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
       if(data.session){if(Store.mode!=='cloud')signedIn(data.session);return}
-      if(data.user&&data.user.identities&&!data.user.identities.length)authMsg('这个邮箱已注册，直接登录即可');else authMsg('注册成功。请到邮箱点一下确认链接，再回来登录；也可以改用「邮箱验证码」直接登录。',true)}
+      if(data.user&&data.user.identities&&!data.user.identities.length)authMsg('这个邮箱已注册，直接登录即可');else{UI.auth.tab='otp';UI.auth.sent=true;UI.auth.msg='注册邮件已发出。在这里输入邮件里的验证码完成注册，不要点邮件里的链接（链接只会在浏览器里登录）。';UI.auth.ok=true;UI.focus='#au-code';render(true);return}}
     catch(e){authMsg(authErr(e))}el.disabled=false},
   authResend(){UI.auth.sent=false;UI.auth.msg='';render(true)},
   authSkip(){try{localStorage.setItem('sjsz:skip','1')}catch(e){}enterLocal()},
@@ -1093,11 +1129,11 @@ function addFromQuick(asDone){
 }
 const SUB={
   async authPw(f){const email=f.elements.email.value.trim(),b=f.querySelector('.pri');UI.auth.email=email;b.disabled=true;
-    try{const{data,error}=await Store.sb.auth.signInWithPassword({email,password:f.elements.pw.value});if(error)throw error;if(Store.mode!=='cloud')signedIn(data.session)}catch(e){authMsg(authErr(e));b.disabled=false}},
+    try{const{data,error}=await Store.sb.auth.signInWithPassword({email,password:f.elements.pw.value});if(error)throw error;if(Store.mode!=='cloud')signedIn(data.session)}catch(e){if(/email not confirmed/i.test((e&&e.message)||'')){try{await Store.sb.auth.resend({type:'signup',email})}catch(x){}UI.auth.tab='otp';UI.auth.sent=true;UI.auth.msg='这个邮箱还没验证。已重新发送邮件，在这里输入里面的验证码即可。';UI.auth.ok=true;UI.focus='#au-code';render(true);return}authMsg(authErr(e));b.disabled=false}},
   async authSend(f){const email=f.elements.email.value.trim(),b=f.querySelector('.pri');UI.auth.email=email;b.disabled=true;
-    try{const{error}=await Store.sb.auth.signInWithOtp({email,options:{shouldCreateUser:true,emailRedirectTo:location.origin+location.pathname}});if(error)throw error;UI.auth.sent=true;UI.auth.msg='邮件已发出。输入里面的验证码；如果邮件里只有链接，直接点链接也能登录。';UI.auth.ok=true;UI.focus='#au-code';render(true)}catch(e){authMsg(authErr(e));b.disabled=false}},
+    try{const{error}=await Store.sb.auth.signInWithOtp({email,options:{shouldCreateUser:true,emailRedirectTo:location.origin+location.pathname}});if(error)throw error;UI.auth.sent=true;UI.auth.msg='邮件已发出。在这里输入里面的验证码，不要点邮件里的链接（链接只会在浏览器里登录，这个 App 不会跟着登录）。';UI.auth.ok=true;UI.focus='#au-code';render(true)}catch(e){authMsg(authErr(e));b.disabled=false}},
   async authVerify(f){const b=f.querySelector('.pri');b.disabled=true;
-    try{const{data,error}=await Store.sb.auth.verifyOtp({email:UI.auth.email,token:f.elements.code.value.trim(),type:'email'});if(error)throw error;if(Store.mode!=='cloud')signedIn(data.session)}catch(e){authMsg(authErr(e));b.disabled=false}},
+    try{const token=f.elements.code.value.replace(/\s/g,'');let res=await Store.sb.auth.verifyOtp({email:UI.auth.email,token,type:'email'});if(res.error)for(const type of['signup','magiclink']){const r2=await Store.sb.auth.verifyOtp({email:UI.auth.email,token,type});if(!r2.error){res=r2;break}}if(res.error)throw res.error;if(Store.mode!=='cloud')signedIn(res.data.session)}catch(e){authMsg(authErr(e));b.disabled=false}},
   async pwSet(f){const b=f.querySelector('button');b.disabled=true;try{const{error}=await Store.sb.auth.updateUser({password:f.elements.pw.value});if(error)throw error;f.reset();toast('密码已更新，下次可以用邮箱 + 密码登录')}catch(e){toast(authErr(e))}b.disabled=false},
   add(){addFromQuick(false)},
   saveTask(f){
@@ -1628,6 +1664,116 @@ function prevSame(view,a,b){const td=today(),[pa,pb]=rangeOf(view,shift(view,a,-
 function calcPrev(view,a,b){return calc(...prevSame(view,a,b))}
 addEventListener('online',()=>{if(Store.mode==='cloud'&&Store.dirty.size){clearTimeout(Store.timer);Store.timer=setTimeout(flush,900)}});
 setInterval(()=>{const t=today();if(t!==UI.today){const old=UI.today;UI.today=t;if(UI.date===old)UI.date=t;if(Store.mode==='cloud'||Store.mode==='local')render()}},20000);
+
+/* ========== 简洁版界面：折叠区块、合并导航、计时器 ========== */
+let FOLD={};try{FOLD=JSON.parse(localStorage.getItem('sjsz:fold')||'{}')||{}}catch(e){}
+let FOLD_ALL=false;try{FOLD_ALL=localStorage.getItem('sjsz:foldall')==='1'}catch(e){}
+try{UI.cal=localStorage.getItem('sjsz:cal')||'week'}catch(e){UI.cal='week'}
+const NAV2=[['day','今日','day'],['cal','日历','month'],['projects','项目','projects'],['money','记账','money'],['report','报告','report'],['prefs','设置','prefs']];
+function renderSide(){
+  const calv=['week','month','year'],cur=k=>k==='cal'?calv.includes(UI.view):UI.view===k,href=k=>k==='cal'?(calv.includes(UI.cal)?UI.cal:'week'):k;
+  const link=(k,n,ic,wrap)=>`<a href="#${href(k)}" ${cur(k)?'aria-current="page"':''}>${ico(ic)}${wrap?`<span>${n}</span>`:n}</a>`;
+  $('#side').innerHTML=`<div class="brand"><img class="logo" src="${APP_ICON}" alt=""><b>四季手账</b></div><nav class="nav" aria-label="视图">${NAV2.map(([k,n,ic])=>link(k,n,ic,1)).join('')}</nav>
+  <div class="side-foot"><span>${Store.mode==='cloud'?esc(Store.name||'已登录'):'未登录'}</span><span class="sync"><i></i><span></span></span></div>`;
+  $('#tabbar').innerHTML=NAV2.map(([k,n,ic])=>link(k,n,ic,0)).join('');setSync(Store.sync);
+}
+function postRender(){
+  if(Store.mode!=='cloud'&&Store.mode!=='local')return;const v=UI.view;
+  document.documentElement.dataset.fx=S.meta.fx?'on':'off';
+  if(['week','month','year'].includes(v)){UI.cal=v;try{localStorage.setItem('sjsz:cal',v)}catch(e){}const h=main.querySelector('.hero');
+    if(h&&!main.querySelector('.calseg'))h.insertAdjacentHTML('afterend',`<div class="row calseg"><span class="seg" role="group" aria-label="日历范围">${[['week','周'],['month','月'],['year','年']].map(([k,n])=>`<button data-act="calGo" data-k="${k}" aria-pressed="${v===k}">${n}</button>`).join('')}</span></div>`)}
+  if(v==='prefs')main.querySelectorAll('.wrap>section.card').forEach((s,i)=>{const h=s.querySelector('h2');if(!h||s.dataset.fold)return;s.dataset.fold='p-'+((h.firstChild&&h.firstChild.textContent)||'').trim();if(i===0)s.dataset.open='1'});
+  main.querySelectorAll('[data-fold]').forEach(s=>{const k=s.dataset.fold,o=FOLD_ALL||(k in FOLD?FOLD[k]:s.dataset.open==='1');s.classList.add('fold');s.classList.toggle('open',!!o);const h=s.querySelector('h2');if(h){h.tabIndex=0;h.setAttribute('role','button');h.setAttribute('aria-expanded',o?'true':'false')}});
+}
+{const _render=render;render=function(force){_render(force);try{postRender()}catch(e){console.error(e)}}}
+function foldToggle(h){const s=h.parentNode,o=!s.classList.contains('open');s.classList.toggle('open',o);h.setAttribute('aria-expanded',o?'true':'false');FOLD[s.dataset.fold]=o;try{localStorage.setItem('sjsz:fold',JSON.stringify(FOLD))}catch(e){}}
+document.addEventListener('click',e=>{const h=e.target.closest&&e.target.closest('.fold>h2');if(!h||e.target.closest('button,a,input,label,select,textarea'))return;foldToggle(h)});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.fold>h2')){e.preventDefault();foldToggle(e.target)}});
+
+/* ---- 统计区：一行摘要，点开看明细 ---- */
+function statsBlock(v,st,pv,days){
+  const rate=st.all?Math.round(st.done/st.all*100):0;
+  return `<section class="card" data-fold="stats-${v}"><h2>统计 <small>完成 ${st.done}/${st.all} · 用时 ${fmtH(st.min)} · 完成率 ${rate}%</small></h2>
+  <div class="sum flat">
+    <div class="kpi"><span>记录用时</span><b>${fmtH(st.min)}</b>${delta(st.min,pv.min)}</div>
+    <div class="kpi"><span>完成事项</span><b>${st.done}<small>/ ${st.all}</small></b>${delta(st.done,pv.done)}</div>
+    <div class="kpi"><span>完成率</span><b>${rate}<small>%</small></b><div class="meter"><i style="width:${rate}%"></i></div></div>
+    <div class="kpi"><span>有记录的天数</span><b>${st.active}<small>/ ${days} 天</small></b><em>活跃日均 ${fmtH(st.active?st.min/st.active:0)}</em></div>
+  </div>
+  <div class="grid2" style="margin-top:16px"><div><div class="sec-h">各标签用时</div>${tagBars(st)}</div>
+  <div><div class="sec-h">事项用时<span class="sp"></span><input class="inp sm" style="width:150px" id="q" placeholder="查某件事，如 背单词" value="${esc(UI.q)}" data-inp="q" aria-label="筛选事项"></div><div id="acts">${actList(st)}</div></div></div></section>`;
+}
+
+/* ---- 计时器：先计时，结束后再归类 ---- */
+const clockTxt=r=>{const s=Math.max(0,Math.floor(((r.end||Date.now())-r.st)/1000));return(s>=3600?Math.floor(s/3600)+':':'')+pad(Math.floor(s%3600/60))+':'+pad(s%60)};
+function runTitle(r){if(r.free)return r.end?'这段计时还没归类':'计时中，结束后再归类';const M=S.months[ymOf(r.d)],t=M&&M.tasks[r.id];return t&&!t.del?t.t:null}
+function stopTimer(){const r=S.meta.running;if(!r)return null;if(r.free){if(!r.end)r.end=Date.now();return r}
+  const M=S.months[ymOf(r.d)],t=M&&M.tasks[r.id];if(t&&!t.del){t.logs=t.logs||[];t.logs.push({s:r.st,m:Math.max(1,Math.round((Date.now()-r.st)/6e4))});upd(t)}S.meta.running=null;return r}
+function startTimer(t){const r=S.meta.running;if(r&&r.free)return false;stopTimer();S.meta.running={id:t.id,d:t.d,st:Date.now()};return true}
+function tickTimer(){const r=S.meta.running;if(!r)return;const s=clockTxt(r),a=$('#tb-el'),b=$('#tc-el');if(a)a.textContent=s;if(b)b.textContent=s}
+function renderTimer(){const r=S.meta.running,bar=$('#timerbar'),title=r?runTitle(r):null;
+  if(!r||title==null||(UI.view==='day'&&UI.date===today())){bar.hidden=true;return}
+  bar.hidden=false;$('#tb-title').textContent=title;const b=bar.querySelector('button');b.textContent=r.free?(r.end?'去归类':'结束并归类'):'结束并记录';b.dataset.act=r.free&&r.end?'freeClass':'timerStop';tickTimer()}
+function timerCard(){const r=S.meta.running,title=r?runTitle(r):null;
+  if(!r||title==null)return `<section class="card tcard"><div class="row"><button class="btn pri" data-act="freeStart">${PLAY} 开始计时</button><span class="small muted grow">先计时，结束后再选这段时间做了什么；也可以点某件事右边的「计时」直接开始。</span></div></section>`;
+  return `<section class="card tcard"><div class="row"><span class="pulse" ${r.end?'style="animation:none;opacity:.4"':''}></span><b class="grow">${esc(title)}</b><span class="num tclock" id="tc-el">${clockTxt(r)}</span><button class="btn pri" data-act="${r.free&&r.end?'freeClass':'timerStop'}">${r.free?(r.end?'去归类':'结束并归类'):'结束并记录'}</button></div></section>`}
+function classifyModal(){const r=S.meta.running;if(!r||!r.free)return;const end=r.end||Date.now(),m=Math.max(1,Math.round((end-r.st)/6e4)),its=dayItems(r.d);
+  openModal(`<h2>这段时间做了什么？<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2>
+  <form data-sub="freeSave" style="display:flex;flex-direction:column;gap:12px">
+    <div class="row"><span class="muted">${hm(r.st)} – ${hm(end)}</span><label class="f" style="flex-direction:row;align-items:center;gap:6px">共<input class="inp sm num" style="width:76px" type="number" min="1" name="m" value="${m}" required>分钟</label></div>
+    <label class="f">记到哪件事<select class="inp" name="tid" data-chg="freePick"><option value="">新建一件事…</option>${its.map(t=>`<option value="${t.id}">${t.done?'✓ ':''}${esc(t.t)}</option>`).join('')}</select></label>
+    <div id="fnew" style="display:flex;flex-direction:column;gap:12px"><label class="f">做了什么<input class="inp" name="t" placeholder="如：读文献" autofocus></label>
+    <label class="f">标签<select class="inp" name="g"><option value="">未分类</option>${S.meta.tags.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label></div>
+    <label class="row" style="gap:8px"><input type="checkbox" name="done" checked> 这件事已经做完</label>
+    <div class="foot"><button type="button" class="btn ghost danger" data-act="freeDrop">丢弃这段计时</button><span class="sp"></span><button class="btn pri">保存</button></div></form>`)}
+
+/* ---- 今日页：只留清单，其余收进折叠区块 ---- */
+function vDay(){
+  const d=UI.date,td=today(),items=dayItems(d).slice().sort((a,b)=>(b.star?1:0)-(a.star?1:0)),todo=items.filter(t=>!t.done),done=items.filter(t=>t.done).sort((a,b)=>(a.at||0)-(b.at||0)),st=calc(d,d);
+  const planned=items.filter(t=>!t.adhoc),pd=planned.filter(t=>t.done).length,planMin=items.reduce((a,t)=>a+(t.plan||0),0),act=items.reduce((a,t)=>a+tmin(t),0),rate=planned.length?Math.round(pd/planned.length*100):0,sk=streak();
+  let carry='';if(d===td){let n=0;for(let i=1;i<=14;i++)n+=dayTasks(addDays(d,-i)).filter(t=>!t.done).length;if(n)carry=`<div class="banner"><span>过去两周还有 <b>${n}</b> 项没做完。</span><span class="sp"></span><button class="btn sm" data-act="carry">全部顺延到今天</button></div>`}
+  const demo=S.meta.demo?`<div class="banner"><span>当前含示例数据，方便你先看效果。</span><span class="sp"></span><button class="btn sm" data-act="demoClear">清除示例</button></div>`:'';
+  const welcome=!hasAny()?`<section class="card welcome"><h2>从今天的第一件事开始</h2><p class="muted" style="margin:0">在下面写下要做的事，回车即可。可以直接带上分类、预计时长和提醒时间，例如：<b>背单词 #学习 30m @21:00</b>。</p><div><button class="btn" data-act="demoLoad">载入示例数据（可一键清除）</button></div></section>`:'';
+  const M=S.months[ymOf(d)]||{},note=((M.notes||{})[d]||{}).t||'',npic=Object.values(M.pics||{}).filter(p=>!p.del&&p.d===d).length,nproj=Object.values(S.projects).filter(p=>!p.arch).length;
+  const tagAttr=(html,k)=>html.replace('<section class="card">',`<section class="card" data-fold="${k}">`);
+  return `${demo}${welcome}${repBanner(d)}${carry}
+  ${d===td?timerCard():''}
+  <form class="card qa" data-sub="add">
+    <div class="row1"><input class="inp" id="qa" name="t" autocomplete="off" placeholder="写下要做的事，回车加入" aria-label="新事项"><button class="btn pri">加入</button></div>
+    <div class="row more"><div class="chips grow" role="group" aria-label="标签">${S.meta.tags.map(t=>`<button type="button" class="chip" data-act="qaTag" data-id="${t.id}" aria-pressed="${UI.qaTag===t.id}"><i class="dot" style="background:var(--c${t.c})"></i>${esc(t.name)}</button>`).join('')}</div><button type="button" class="btn sm" data-act="addDone" data-tip="不进待做，直接记为刚做完的事">直接记为已做</button>
+    <span class="small muted" style="flex-basis:100%">可以写成「背单词 #学习 30m @21:00」，一次带上标签、预计时长和提醒时间。</span></div>
+  </form>
+  ${items.length?`<div class="dsum"><span><b>${pd}</b> / ${planned.length} 完成</span><span>已用 <b>${fmtH(act)}</b>${planMin?' / 计划 '+fmtH(planMin):''}</span>${sk>1?`<span>连续 <b>${sk}</b> 天</span>`:''}<span class="meter"><i style="width:${rate}%"></i></span></div>`:''}
+  <div class="cols2">
+    <section class="card"><h2>待做 <small>${todo.length} 项</small></h2><ul class="list">${todo.map(taskRow).join('')||`<li class="empty">${done.length?'都做完了。':'还没有待做事项。'}</li>`}</ul></section>
+    <section class="card"><h2>已做 <small>${done.length} 项${act?' · '+fmtMin(done.reduce((a,t)=>a+tmin(t),0)):''}</small></h2><ul class="list">${done.map(taskRow).join('')||`<li class="empty">完成的事会移到这里。</li>`}</ul></section>
+  </div>
+  <section class="card" data-fold="d-time"><h2>时间轴与用时 <small>${st.min?fmtMin(st.min):'还没有记录'}</small></h2>${timeline(items)}<div style="margin-top:14px">${tagBars(st)}</div></section>
+  <section class="card" data-fold="d-proj"><h2>长线项目 <small>${nproj?nproj+' 个进行中':'还没有'}</small></h2>${projStrip()}</section>
+  <section class="card" data-fold="d-note"><h2>当日小结 <small>${note?'已写':'还没写'}</small></h2><textarea class="inp" id="note" data-inp="note" placeholder="今天最顺的一件事、卡住的地方、明天先做什么…">${esc(note)}</textarea></section>
+  ${tagAttr(picsCard(d),'d-pics')}
+  ${tagAttr(moneyDayCard(d),'d-money')}`;
+}
+{const _vp=vPrefs;vPrefs=function(){return _vp().replace('<section class="card"><h2>标签',`<section class="card"><h2>界面 <small>动效</small></h2><label class="row" style="gap:8px"><input type="checkbox" data-chg="fx" ${S.meta.fx?'checked':''}> 显示飘落的花瓣、落叶、雪花和海浪（默认关闭，画面更安静）</label></section>\n  <section class="card"><h2>标签`)}}
+
+Object.assign(ACT,{
+  calGo(el){location.hash=el.dataset.k},
+  freeStart(){const r=S.meta.running;if(r){toast(r.free?'已经在计时了':'「'+(runTitle(r)||'')+'」正在计时，先结束它');return}S.meta.running={free:1,d:today(),st:Date.now()};commit('meta')},
+  freeClass(){classifyModal()},
+  freeDrop(el){if(!armed(el))return;S.meta.running=null;closeModal();commit('meta')},
+  timer(el){const r=S.meta.running;if(r&&r.free){toast('先结束并归类当前的计时');return}const t=getTask(el.dataset.d,el.dataset.id);if(!t)return;const docs=new Set(['meta','m-'+ymOf(t.d)]);if(r)docs.add('m-'+ymOf(r.d));if(r&&r.id===t.id)stopTimer();else startTimer(t);commit(...docs)},
+  timerStop(){const r=S.meta.running;if(!r)return;if(r.free){stopTimer();commit('meta');classifyModal();return}stopTimer();commit('meta','m-'+ymOf(r.d));toast('已记录这段用时')},
+});
+Object.assign(SUB,{
+  freeSave(f){const r=S.meta.running;if(!r||!r.free)return closeModal();const E=f.elements,m=Math.max(1,Math.round(+E.m.value||0)),end=r.end||Date.now();let t=null;
+    if(E.tid.value)t=getTask(r.d,E.tid.value);
+    if(!t){const title=E.t.value.trim();if(!title){toast('写一下做了什么，或者选一件已有的事');E.t.focus();return}t=addTask({t:title,d:r.d,g:E.g.value});t.adhoc=1}
+    t.logs=t.logs||[];t.logs.push({s:r.st,m});if(E.done.checked&&!t.done){t.done=1;t.at=end}upd(t);S.meta.running=null;closeModal();commit('meta','m-'+ymOf(t.d));toast(`已把 ${fmtMin(m)} 记到「${t.t}」`)},
+});
+Object.assign(CHG,{
+  fx(el){S.meta.fx=el.checked;commit('meta')},
+  freePick(el){const b=$('#fnew');if(b)b.style.display=el.value?'none':'flex'},
+});
 
 boot();
 </script>
