@@ -445,6 +445,9 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--in
 .quote cite{font-style:normal;font-size:11px;opacity:.8}
 .daytip{font-size:13px;line-height:1.7;margin:12px 0 0;padding:9px 12px;border-radius:10px;background:rgba(var(--accent-rgb),.09)}
 .scb{font-size:10px;font-weight:700;line-height:16px;padding:0 5px;border-radius:99px;background:rgba(var(--accent-rgb),.16);margin-left:5px;font-variant-numeric:tabular-nums;vertical-align:middle}
+.scrow{grid-template-columns:minmax(72px,1fr) auto minmax(1.6em,auto)}
+.sug{font-size:11px;font-weight:600;color:var(--accent);border:1px dashed var(--accent);border-radius:99px;padding:1px 8px;white-space:nowrap}
+.sug:hover{background:rgba(var(--accent-rgb),.12)}
 </style>
 </head>
 <body>
@@ -2037,6 +2040,48 @@ function dayTip(d){const sc=dayScore(d);if(!sc)return'';const ds=dimsOf().filter
 {const _sc=scoreCard;scoreCard=function(d){const tip=dayTip(d);return tip?_sc(d).replace('<div class="row small" style="margin-top:12px">',`<p class="daytip">${esc(tip)}</p><div class="row small" style="margin-top:12px">`):_sc(d)}}
 {const _r=render;render=function(f){_r(f);try{if(Store.mode!=='cloud'&&Store.mode!=='local')return;const w=main.querySelector('.wrap');if(w&&!w.querySelector('.quote'))w.insertAdjacentHTML('beforeend',quoteHtml(UI.view==='day'?UI.date:today()));
   if(UI.view==='month'||UI.view==='week')main.querySelectorAll('.cal-d[data-d],.wd[data-d]').forEach(el=>{if(el.querySelector('.scb'))return;const s=dayScore(el.dataset.d);if(!s)return;const h=el.querySelector('b');if(h)h.insertAdjacentHTML('afterend',`<span class="scb" data-tip="当天评分 ${s.total} 分">${s.total}</span>`)})}catch(e){console.error(e)}}}
+
+/* ========== 睡眠记录、打分建议、全局搜索 ========== */
+const isHM=s=>typeof s==='string'&&/^\d\d:\d\d$/.test(s);
+const scoreEntry=d=>{const M=S.months[ymOf(d)];return(M&&M.scores&&M.scores[d])||null};
+function sleepHours(e){if(!e||!isHM(e.bed)||!isHM(e.wake))return null;let m=hmMin(e.wake)-hmMin(e.bed);if(m<=0)m+=1440;return m/60}
+function sleepStats(from,to){let n=0,H=0,B=0;for(let d=from;d<=to;d=addDays(d,1)){const e=scoreEntry(d),h=sleepHours(e);if(h==null)continue;n++;H+=h;let b=hmMin(e.bed)-1080;if(b<0)b+=1440;B+=b}if(!n)return null;const bm=Math.round(B/n+1080)%1440;return{n,avg:H/n,bm,bed:pad(Math.floor(bm/60))+':'+pad(bm%60)}}
+function dayTagMin(d,re){let m=0;const M=S.months[ymOf(d)];if(M)for(const id in M.tasks){const t=M.tasks[id];if(t.del||t.d!==d)continue;const g=tagOf(t.g);if(g&&re.test(g.name))m+=tmin(t)}return m}
+function suggestScore(d,dm){const k=dimKind(dm.name);
+  if(k==='sleep'){const h=sleepHours(scoreEntry(d));if(h==null)return null;return{v:h>=7.5?5:h>=7?4:h>=6?3:h>=5?2:1,why:`睡了 ${h.toFixed(1)} 小时`}}
+  if(k==='study'){const m=dayTagMin(d,/学习|阅读|读书|工作|实验|写作/);if(!m)return null;return{v:m>=240?5:m>=150?4:m>=75?3:m>=25?2:1,why:`当天相关记录 ${fmtMin(m)}`}}
+  if(k==='body'){const m=dayTagMin(d,/锻炼|运动|健身/);if(!m)return null;return{v:m>=60?5:m>=40?4:m>=20?3:2,why:`当天锻炼 ${fmtMin(m)}`}}
+  if(k==='money'){const out=dayBills(d).filter(b=>b.k!=='in').reduce((a,b)=>a+b.amt,0);let base=0,why='';const[ma,mb]=rangeOf('month',d);
+    if(+S.meta.budget>0){base=S.meta.budget/(diffDays(ma,mb)+1);why='每日预算 '+fmtY(base)}else{const p=calcMoney(addDays(d,-30),addDays(d,-1));if(!p.out)return null;base=p.out/30;why='近 30 天日均 '+fmtY(base)}
+    return{v:out<=base*.5?5:out<=base?4:out<=base*1.5?3:out<=base*2?2:1,why:`当天支出 ${fmtY(out)}，${why}`}}
+  return null}
+function scoreCard(d){const sc=dayScore(d),e=(sc&&sc.v)||{},f=focusOf(d),en=scoreEntry(d)||{},h=sleepHours(en);
+  return `<section class="card" data-fold="d-score" data-open="1"><h2>给这一天打分 <small>${sc?sc.total+' 分':'还没打分'}</small></h2>
+  <div class="row small" style="margin-bottom:12px;gap:8px 12px"><span class="muted">睡眠记录</span><label class="row" style="gap:6px">昨晚<input class="inp sm" type="time" style="width:auto" value="${isHM(en.bed)?en.bed:''}" data-chg="sleepSet" data-k="bed" data-d="${d}" aria-label="入睡时间">睡</label><label class="row" style="gap:6px">今早<input class="inp sm" type="time" style="width:auto" value="${isHM(en.wake)?en.wake:''}" data-chg="sleepSet" data-k="wake" data-d="${d}" aria-label="起床时间">起</label>${h!=null?`<b class="num">共 ${h.toFixed(1)} 小时</b>`:''}</div>
+  <div class="scgrid">${dimsOf().map(dm=>{const w=dimW(d,dm.id),cur=e[dm.id]||0,sg=cur?null:suggestScore(d,dm),a=`data-d="${d}" data-dim="${esc(dm.id)}"`;return `<div class="scrow"><span class="nm">${esc(dm.name)}${w>1?`<em>×${w}</em>`:''}</span><span class="dots" role="group" aria-label="${esc(dm.name)}评分">${[1,2,3,4,5].map(v=>`<button data-act="scoreSet" ${a} data-v="${v}" aria-pressed="${cur>=v}" aria-label="${esc(dm.name)} ${v} 分"></button>`).join('')}</span><span class="num muted">${cur||(sg?`<button class="sug" data-act="scoreSet" ${a} data-v="${sg.v}" data-tip="${esc(sg.why)}，点一下采用">建议 ${sg.v}</button>`:'–')}</span></div>`}).join('')}</div>
+  <div class="row small" style="margin-top:12px"><span class="muted grow">${f?`当前重点：<b style="color:var(--ink)">${esc(f.name)}</b>（${mdCN(f.from)} – ${mdCN(f.to)}）。带 × 的维度在总分里占更大比重。`:'可以设一个阶段重点，比如这周攒钱、这个月健身，对应的维度在总分里占更大比重。'}</span><button class="btn sm" data-act="focusOpen" data-d="${d}">${f?'修改重点':'设置重点'}</button></div></section>`}
+{const _ss=scoreSection;scoreSection=function(v){const h=_ss(v),[a,b]=rangeOf(v,UI.date),sl=sleepStats(a,b);return sl?h.replace(/<\/section>$/,`<p class="small muted" style="margin:10px 0 0">平均睡眠 ${sl.avg.toFixed(1)} 小时，平均 ${sl.bed} 入睡，记录了 ${sl.n} 天。</p></section>`):h}}
+{const _sr=scoreReport;scoreReport=function(R){const o=_sr(R);if(!o)return o;const td=today(),sl=sleepStats(R.from,R.to<td?R.to:td);if(sl&&sl.n>=2){const h=sl.avg.toFixed(1);o.lines.push(`平均睡眠 ${h} 小时，平均 ${sl.bed} 入睡`);
+  if(sl.avg<6.5)o.tips.unshift(`这一期平均只睡 ${h} 小时。长期睡不够，专注、情绪和免疫都会受影响，代价比少做几件事大得多。这周先把入睡时间提前半小时。`);
+  else if(sl.bm>=30&&sl.bm<=360)o.tips.push(`平均 ${sl.bed} 才入睡。时长是够的，但睡得太晚会拖累第二天上午，试着每周提前十五分钟。`);
+  else if(sl.avg>=7.5)o.tips.push(`平均睡眠 ${h} 小时，很扎实。这是好状态的底子，保持住。`);o.tips=o.tips.slice(0,5)}return o}}
+{const _ci=cleanImport;cleanImport=function(o){const keep={};for(const ym in o.months||{}){const sc=o.months[ym]&&o.months[ym].scores;if(sc&&typeof sc==='object')for(const d in sc){const e=sc[d];if(e&&(isHM(e.bed)||isHM(e.wake)))keep[d]={bed:isHM(e.bed)?e.bed:undefined,wake:isHM(e.wake)?e.wake:undefined}}}_ci(o);for(const ym in o.months)for(const d in keep)if(ymOf(d)===ym){const sc=o.months[ym].scores=o.months[ym].scores||{};sc[d]=sc[d]||{v:{},u:0};if(keep[d].bed)sc[d].bed=keep[d].bed;if(keep[d].wake)sc[d].wake=keep[d].wake}}}
+function searchAll(q){q=q.trim().toLowerCase();if(!q)return[];const out=[];
+  for(const ym in S.months){const M=S.months[ym];for(const id in M.tasks){const t=M.tasks[id];if(!t.del&&(t.t||'').toLowerCase().includes(q))out.push({d:t.d,k:t.done?'done':'todo',t:t.t,g:t.g})}
+    for(const d in M.notes||{}){const n=M.notes[d];if(n&&(n.t||'').toLowerCase().includes(q))out.push({d,k:'note',t:n.t.replace(/\s+/g,' ').slice(0,60)})}
+    for(const id in M.bills||{}){const b=M.bills[id];if(!b.del&&(catName(b.cat)+' '+(b.note||'')).toLowerCase().includes(q))out.push({d:b.d,k:'bill',t:(catName(b.cat)+' '+(b.note||'')).trim()+' '+fmtY(b.amt)})}}
+  return out.sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:0).slice(0,80)}
+function searchHtml(q){if(!q.trim())return '<p class="empty" style="padding:0">输入关键词，查找所有日期里的事项、小结和账目。</p>';const rs=searchAll(q);if(!rs.length)return '<p class="empty" style="padding:0">没有找到。</p>';const lab={done:'已做',todo:'待做',note:'小结',bill:'账目'};
+  return rs.map(r=>`<button class="actrow" style="width:100%;grid-template-columns:auto minmax(0,1fr) auto" data-act="srchGo" data-d="${r.d}"><span class="n num">${r.d}</span><span class="nm">${r.g!=null?`<i class="dot" style="background:${tagColor(r.g)}"></i>`:''}<span>${esc(r.t)}</span></span><span class="n">${lab[r.k]}</span></button>`).join('')+(rs.length>=80?'<p class="small muted" style="margin:8px 0 0">只显示最近的 80 条，换个更具体的词可以缩小范围。</p>':'')}
+{const _r=render;render=function(f){_r(f);try{if(Store.mode!=='cloud'&&Store.mode!=='local')return;const hx=main.querySelector('.hero .hx');if(hx&&UI.view!=='prefs'&&!hx.querySelector('[data-act=srchOpen]'))hx.insertAdjacentHTML('afterbegin','<button class="hbtn" data-act="srchOpen">搜索</button>')}catch(e){console.error(e)}}}
+Object.assign(ACT,{
+  srchOpen(){openModal(`<h2>搜索<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2><input class="inp" id="srch" data-inp="srch" placeholder="事项、小结或账目里的词" aria-label="搜索关键词" autocomplete="off" autofocus><div id="srch-res" style="max-height:52vh;overflow:auto">${searchHtml('')}</div>`,true)},
+  srchGo(el){closeModal();UI.date=el.dataset.d;if(UI.view==='day'){render(true);main.scrollTop=0}else location.hash='day'},
+});
+Object.assign(CHG,{
+  sleepSet(el){const d=el.dataset.d,M=month(ymOf(d),1),e=M.scores[d]||{v:{}};if(isHM(el.value))e[el.dataset.k]=el.value;else delete e[el.dataset.k];e.u=Date.now();M.scores[d]=e;commit('m-'+ymOf(d))},
+});
+Object.assign(INP,{srch(el){const r=$('#srch-res');if(r)r.innerHTML=searchHtml(el.value)}});
 
 boot();
 </script>
