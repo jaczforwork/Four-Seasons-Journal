@@ -482,6 +482,31 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--in
   .wd.open .its{display:flex}
   .wd.open::after{content:"再点一次，打开这一天";flex-basis:100%;order:6;font-size:11px;color:var(--ink2)}
 }
+/* 今日页优先 */
+.hero.hero-s{padding:10px 16px;align-items:center;gap:8px 14px}
+.hero.hero-s .big{font-size:34px;line-height:1}
+.hero.hero-s .ht{flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap;padding:0}
+.hero.hero-s .ht b{font-size:17px}
+.hero.hero-s .hbtn{height:32px;min-width:32px}
+.qa:focus-within .more{display:none}
+.qa:has(#qa:not(:placeholder-shown)) .more{display:flex}
+.qa .row1 .inp{height:44px;font-size:16px}
+.auxlab{font-size:12px;color:var(--ink2);padding:6px 4px 0;margin-bottom:-6px}
+.wrap>.auxlab~.fold:not(.open){padding:10px 16px}
+.wrap>.auxlab~.fold:not(.open)>h2{font-weight:600;font-size:14px}
+.helpl{list-style:disc;padding-left:20px;display:flex;flex-direction:column;gap:6px;line-height:1.7;max-width:70ch}
+a.hbtn{text-decoration:none}
+.hmore .hbtn.solid{background:rgba(255,255,255,.4);color:inherit}
+@media (max-width:560px){
+.hero.hero-s{padding:10px 14px;flex-wrap:nowrap;align-items:center}
+.hero.hero-s .big{font-size:30px}
+.hero.hero-s .ht{min-width:0;flex-direction:column;align-items:flex-start;gap:0}
+.hero.hero-s .ht b{font-size:15px;white-space:nowrap}
+.hero.hero-s .ht span{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.hero.hero-s .hx{flex-wrap:nowrap;gap:6px;flex:none}
+.hero.hero-s:has(.hmore[open]){flex-wrap:wrap}
+.hero.hero-s:has(.hmore[open]) .hx{flex-wrap:wrap;flex:1 1 100%}
+}
 </style>
 </head>
 <body>
@@ -2188,6 +2213,48 @@ Object.assign(ACT,{
   pkDel(el){if(!armed(el))return;S.meta.parked=parkedOf().filter(x=>x.id!==el.dataset.id);commit('meta')},
 });
 Object.assign(CHG,{blDate(el){if(!el.value)return;const t=blTask(el);if(!t)return;t.mv=(t.mv||0)+1;commit(...moveTask(t,el.value));backlogModal()}});
+
+/* ========== 今日页优先：进来就能记；说明收进「帮助」，只在第一次用到时提示 ========== */
+NAV.push(['help','帮助']);
+let SEEN={};try{SEEN=JSON.parse(localStorage.getItem('sjsz:seen')||'{}')||{}}catch(e){}
+const seen=k=>!!SEEN[k];
+function markSeen(k,v){SEEN[k]=v===undefined?1:v;try{localStorage.setItem('sjsz:seen',JSON.stringify(SEEN))}catch(e){}}
+function hintOnce(k,text){if(seen(k))return;markSeen(k);toast(text)}
+const HELP=[
+['快速记事',['在今日页顶部的输入框写下要做的事，回车加入。','可以一次带上标签、预计时长和提醒时间：背单词 #学习 30m @21:00。','已经做完的事，输入后点「直接记为已做」。','点事项左边的圆圈标为完成；点事项名称修改标签、日期、时长、提醒等。']],
+['计时',['点事项右边的「计时」为这件事计时，再点一次停止。','点输入框旁的「计时」先开始计时，结束后再选这段时间做了什么。','忘了计时，可以在事项的编辑里补记开始时间和时长。']],
+['日历、筛选与搜索',['「日历」里用 周 / 月 / 年 切换。做完的事前面打勾，逾期没做的标红。','手机上的周视图先显示七天摘要，点一下展开，再点一次进入当天。','「更多」里可以搜索所有日期的事项、小结和账目，也可以只看某几个标签；筛选对统计、报告和导出同样生效。','「更多 → 导出图片」把当前页面导出成一张长图。']],
+['积压与暂存',['过期没做的事会在今日页提示，点「整理」逐件决定：排到今天或明天、改到某一天、放进暂存箱，或取消。','暂存箱在今日页下方，里面的事可以随时排回某一天。']],
+['打分与阶段重点',['在今日页展开「给这一天打分」，每个维度 1–5 分；旁边的「建议」是按当天记录估的，点一下采用。','总分把 1–5 分折算成 0–100（1 分 = 0，5 分 = 100），只算打了分的维度。','「设置重点」可以指定一段时间里更看重的维度，它们在总分里占更大比重。','可以记录昨晚几点睡、今早几点起，用来算睡眠时长。']],
+['长线项目',['阶段目标型：列出阶段和小目标，进度按权重估算；数量累计型：每天记数量，按近两周的速度估算完成日期。','进度条上的竖线是按时间应到的位置，条比线长就是超前。','可以给项目设每天的提醒时间。']],
+['记账',['在「记账」页或今日页的「当日收支」里记一笔；点一笔账可以修改。','月预算和分类在设置里调整。']],
+['报告',['「报告」按周、月、年自动整理：最重要的成果、时间去向、项目进展、收支、评分趋势和小提醒。','标了 ★ 并做完的事会进入「最重要的成果」。在事项的编辑里可以标 ★。','可以复制为文字或导出图片。']],
+['提醒',['事项、例行事项、项目都可以设提醒时间；到点后页面顶部出现提醒条。','提醒只在页面开着时生效。想在页面关闭时也被提醒，可在设置里把提醒导出到系统日历。']],
+['统计口径',['记录用时只包含计过时或补记了时长的事项。','完成率只统计到今天为止的事项；图里带斜纹的是还没到的日期，「未记录」不等于 0。','和上期比较时用相同的天数；记录不足 3 天时不比较。']],
+['账号、同步与安装',['登录后数据自动同步到云端，换设备登录同一个账号即可。','iPhone / iPad：用 Safari 打开 → 分享 → 添加到主屏幕；Windows：用 Edge 或 Chrome 打开 → 地址栏的安装图标。','登录时输入邮件里的验证码，不要点邮件里的链接。']],
+];
+function helpHtml(){return `<div class="wrap"><header class="hero"><div class="big txt">帮助</div><div class="ht"><span>常用操作都在这一页。个性化的选项在「设置」里。</span></div><div class="hx"><a class="hbtn" href="#day">回到今日</a><a class="hbtn" href="#prefs">设置</a></div></header>${HELP.map(([t,ls],i)=>`<section class="card fold ${i<2?'open':''}" data-fold="h-${i}"><h2 tabindex="0" role="button" aria-expanded="${i<2}">${t}</h2><ul class="helpl">${ls.map(l=>`<li>${esc(l)}</li>`).join('')}</ul></section>`).join('')}</div>`}
+{const _add=SUB.add;SUB.add=function(f){const had=!!($('#qa')&&$('#qa').value.trim());_add(f);if(had)markSeen('adds',(+SEEN.adds||0)+1)}}
+{const _tg=ACT.toggle;ACT.toggle=function(el,e){const was=el.closest('.task')&&el.closest('.task').classList.contains('is-done');_tg(el,e);if(!was)hintOnce('done1','已移到「已做」。点右侧的用时可以补记时长。')}}
+{const _fs=ACT.freeStart;ACT.freeStart=function(el){_fs(el);if(S.meta.running&&S.meta.running.free)hintOnce('free1','开始计时了。结束时再选这段时间做了什么。')}}
+Object.assign(ACT,{hintX(el){markSeen(el.dataset.k);const p=el.closest('.modhint');if(p)p.remove()}});
+{const _r=render;render=function(f){
+  if(UI.view==='help'&&(Store.mode==='cloud'||Store.mode==='local')){applySeason();main.innerHTML=helpHtml();renderSide();renderTimer();main.scrollTop=0;addHelpLink();return}
+  _r(f);try{if(Store.mode!=='cloud'&&Store.mode!=='local')return;const v=UI.view;addHelpLink();
+  const hm=main.querySelector('.hmore .hmenu');if(hm&&!hm.querySelector('[href="#help"]'))hm.insertAdjacentHTML('beforeend','<a class="hbtn" href="#help">帮助</a>');
+  if(v==='day'){const hero=main.querySelector('.hero');if(hero)hero.classList.add('hero-s');
+    const more=main.querySelector('.qa .more .small.muted');if(more&&(+SEEN.adds||0)>=3)more.remove();
+    const fx=main.querySelector('[data-fold=d-score] .row.small .muted.grow');if(fx&&!focusOf(UI.date))fx.textContent='';
+    const mh=main.querySelector('.modhint');if(mh){if(seen('modhint'))mh.remove();else if(!mh.querySelector('.x'))mh.insertAdjacentHTML('beforeend',' <button class="x xs" data-act="hintX" data-k="modhint" aria-label="不再提示">×</button>')}
+    const first=main.querySelector('.wrap>.fold');if(first&&!main.querySelector('.auxlab'))first.insertAdjacentHTML('beforebegin','<div class="auxlab">其他记录</div>');
+    const qa=$('#qa');if(qa&&innerWidth<560)qa.placeholder='写下要做的事';if(qa&&modal.hidden&&(document.activeElement===document.body||document.activeElement===null)&&matchMedia('(pointer:fine)').matches)qa.focus({preventScroll:true})}
+  if(['week','month','year','projects'].includes(v)){main.querySelectorAll('section.card:not([data-fold])>h2>small,section.card:not([data-fold])>.sec-h>small').forEach(s=>{if(s.textContent.length>10)s.remove()});
+    if(v==='projects')main.querySelectorAll('.wrap>.row>.muted.small').forEach(s=>s.remove())}
+  if(v==='prefs')main.querySelectorAll('.wrap>section.card p').forEach(p=>{if(p.closest('details')||p.textContent.length<46||p.querySelector('button,input,select'))return;const d=document.createElement('details');d.className='how';d.style.margin='0 0 10px';d.innerHTML='<summary>说明</summary>';p.replaceWith(d);p.style.margin='6px 0 0';d.appendChild(p)});
+}catch(e){console.error(e)}}}
+/* 空的快速输入框不阻塞同步刷新（桌面端刷新后会重新聚焦）；触屏上保持原样，避免收起键盘 */
+function typingInMain(){const a=document.activeElement;if(!(a&&main.contains(a)&&/INPUT|TEXTAREA/.test(a.tagName))||['range','checkbox','radio','date','file'].includes(a.type))return false;if(a.id==='qa'&&!a.value&&matchMedia('(pointer:fine)').matches)return false;return true}
+function addHelpLink(){const sf=document.querySelector('#side .side-foot');if(sf&&!sf.querySelector('[href="#help"]'))sf.insertAdjacentHTML('afterbegin','<a class="lnk" href="#help" style="align-self:flex-start">帮助</a>')}
 
 boot();
 </script>
