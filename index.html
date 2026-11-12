@@ -634,6 +634,11 @@ html.landing,html.landing body{overflow:hidden}
 .t-meta .from{color:var(--accent);font-weight:600}
 .t-meta .anote{white-space:normal}
 @media (max-width:640px){.shsteps{grid-template-columns:minmax(0,1fr)}}
+#land .hbtn.pri{background:var(--accent);color:#fff;border-color:transparent;font-weight:600}
+#land .hbtn:disabled{opacity:.6}
+#land .lprev{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:auto}
+#land .lprev img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.12);-webkit-touch-callout:default}
+#land .lhint{margin:0;text-align:center;font-size:12px;color:var(--ink2);flex:none}
 </style>
 </head>
 <body>
@@ -2563,7 +2568,7 @@ function landHtml(){const d=UI.landD,[a,b]=rangeOf('month',d),D=parse(a),td=toda
   ${land.classList.contains('rot')?'<button class="hbtn" data-act="landFlip" aria-label="换个方向" title="换个方向">⇅</button>':''}<button class="hbtn" data-act="landClose" aria-label="关闭">×</button></div>
   <div class="lgrid" style="--rows:${rows}">${['一','二','三','四','五','六','日'].map(w=>`<span class="wh">周${w}</span>`).join('')}${cells}</div></div>`}
 function landFit(){if(land.hidden)return;const W=innerWidth,H=innerHeight,rot=H>W&&W<760&&!UI.landLocked;land.classList.toggle('rot',rot);land.classList.toggle('flip',rot&&!!UI.landFlip);land.style.setProperty('--W',W+'px');land.style.setProperty('--H',H+'px');
-  land.innerHTML=landHtml();const g=land.querySelector('.lgrid'),wh=g.querySelector('.wh');if(g){const rows=+g.style.getPropertyValue('--rows')||6,avail=g.clientHeight-(wh?wh.offsetHeight:20)-4*rows;g.style.setProperty('--rh',Math.max(rot||W<760?78:96,Math.floor(avail/rows))+'px')}}
+  land.innerHTML=landHtml();const g=land.querySelector('.lgrid'),wh=g&&g.querySelector('.wh');if(g){const rows=+g.style.getPropertyValue('--rows')||6,avail=g.clientHeight-(wh?wh.offsetHeight:20)-4*rows;g.style.setProperty('--rh',Math.max(rot||W<760?78:96,Math.floor(avail/rows))+'px')}}
 async function landOpen(){UI.landD=UI.date;UI.landLocked=0;land.hidden=false;document.documentElement.classList.add('landing');landFit();land.querySelector('.lbar .hbtn:last-child').focus({preventScroll:true});
   if(isPhone()&&innerHeight>innerWidth&&land.requestFullscreen&&screen.orientation&&screen.orientation.lock){try{await land.requestFullscreen({navigationUI:'hide'});await screen.orientation.lock('landscape');UI.landLocked=1}catch(e){UI.landLocked=0}landFit()}}
 function landClose(){if(land.hidden)return;land.hidden=true;land.innerHTML='';document.documentElement.classList.remove('landing');try{if(UI.landLocked&&screen.orientation&&screen.orientation.unlock)screen.orientation.unlock()}catch(e){}UI.landLocked=0;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}
@@ -2743,6 +2748,73 @@ function shDayCard(d){const P=shPartner();if(!P)return'';const xs=SH.sent.filter
 HELP.splice(HELP.length-1,0,['共享',['在「共享」页设一个称呼，一方生成邀请码，另一方输入，两个账号就关联上了。','「给 TA 安排」的事会直接出现在对方那天的待做里，标着「来自 某某」；对方完成后你这边会打勾，并收到提醒。','对方安排的事你可以像自己的事一样计时、顺延；不想做就删掉，对方会看到「对方删掉了」。','每天的小结和照片默认私密。在今日页「当日小结」下面可以单独开放那一天；共享页里可以设置新的日子默认开放。','解除关联后，双方都看不到对方开放的内容。']]);
 {const _e=exportData;exportData=function(){const E=_e(),by={};for(const ym in S.months)for(const t of Object.values(S.months[ym].tasks||{}))if(t.aid&&!t.del)by[t.id]=t;for(const x of E.tasks){const t=by[x.id];x.assigned_by=t?shName(t.afrom):''}return E}}
 {const h=HELP.find(x=>x[0]==='日历、筛选与搜索');if(h)h[1].splice(1,0,'月视图右上角的「横屏查看」：手机竖着拿时会把月历转成横向，把手机横过来看，每天的事显示得更完整；点「⇅」换方向。电脑和平板上是全屏查看。')}
+/* ========== 横版月历导出 ========== */
+async function landPoster(d){
+  const P=readPal(),[a0,b0]=rangeOf('month',d),D=parse(a0),n=diffDays(a0,b0)+1,lead=(D.getDay()+6)%7,rows=Math.ceil((lead+n)/7),st=calc(a0,b0),tdd=today(),season=document.documentElement.dataset.season;
+  const W=2000,M=48,gap=10,cw=(W-2*M-gap*6)/7,FS=19,LH=25,MAXI=10,showScore=modOn('score');
+  const SANS='"PingFang SC","Microsoft YaHei","Noto Sans SC","Figtree",sans-serif',DISP='"ZCOOL XiaoWei",'+SANS,title=`${D.getFullYear()} 年 ${D.getMonth()+1} 月`;
+  try{await Promise.all([document.fonts.load('64px "ZCOOL XiaoWei"',title+'四季手账春夏秋冬0123456789'),document.fonts.ready])}catch(e){}
+  const cv=document.createElement('canvas');cv.width=W;cv.height=6000;const c=cv.getContext('2d');
+  const T=(s,x,y,size,color,o={})=>{c.font=`${o.w||400} ${size}px ${o.disp?DISP:SANS}`;c.fillStyle=color;c.textAlign=o.a||'left';c.textBaseline='alphabetic';let str=String(s);if(o.max)while(c.measureText(str).width>o.max&&str.length>1)str=str.slice(0,-2)+'…';c.fillText(str,x,y);return c.measureText(str).width};
+  const R=(x,y,w,h,r,fill)=>{if(w<=0||h<=0)return;c.beginPath();if(c.roundRect)c.roundRect(x,y,w,h,Math.min(r,w/2,h/2));else c.rect(x,y,w,h);c.fillStyle=fill;c.fill()};
+  const tick=(x,y,sz,color)=>{c.strokeStyle=color;c.lineWidth=Math.max(2,sz/5);c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(x+sz*.1,y+sz*.55);c.lineTo(x+sz*.4,y+sz*.84);c.lineTo(x+sz*.92,y+sz*.2);c.stroke()};
+  const ring=(x,y,r,color)=>{c.strokeStyle=color;c.lineWidth=2;c.beginPath();c.arc(x,y,r,0,6.3);c.stroke()};
+  const col=g=>{const t=tagOf(g);return t?P.c[t.c]:P.ink2};
+  const wrap2=(str,size,w,bold)=>{c.font=`${bold?700:400} ${size}px ${SANS}`;const out=[];let cur='';for(const ch of String(str)){if(c.measureText(cur+ch).width>w&&cur){out.push(cur);cur=ch;if(out.length===2)break}else cur+=ch}if(out.length<2&&cur)out.push(cur);else if(out.length===2&&cur!==out[1]){let l=out[1];while(c.measureText(l+'…').width>w&&l.length>1)l=l.slice(0,-1);out[1]=l+'…'}return out};
+  // 先排版：每格需要多高
+  const cells=[];for(let i=0;i<n;i++){const x=addDays(a0,i),its=sortedItems(x),k=lead+i,L=[];
+    for(const t of its.slice(0,MAXI)){const od=!t.done&&x<tdd;L.push({t,od,lines:wrap2((t.star?'★ ':'')+t.t,FS,cw-46,od)})}
+    cells.push({x,k,its,L,h:56+L.reduce((s,o)=>s+o.lines.length*LH+5,0)+(its.length>MAXI?LH+2:0)+12})}
+  const rowH=[...Array(rows)].map((_,r)=>Math.max(150,...cells.filter(o=>Math.floor(o.k/7)===r).map(o=>o.h)));
+  // 头部
+  const gr=c.createLinearGradient(M,0,W-M,0);gr.addColorStop(0,P.hero1);gr.addColorStop(1,P.hero2);R(M,M,W-2*M,150,30,gr);
+  T(title,M+40,M+92,64,P.heroInk,{disp:1});
+  const rate=st.all?Math.round(st.done/st.all*100):0,parts=[`完成 ${st.done} / ${st.all}`,`完成率 ${rate}%`];if(st.min)parts.push('记录 '+fmtH(st.min));if(st.active)parts.push(`有记录 ${st.active} 天`);if(UI.tf)parts.push('仅'+tfLabel());
+  T(parts.join('  ·  '),M+42,M+128,24,P.heroInk);
+  c.save();c.translate(W-M-86,M+75);c.rotate(-.1);c.strokeStyle=P.second;c.lineWidth=5;c.beginPath();if(c.roundRect)c.roundRect(-40,-40,80,80,14);else c.rect(-40,-40,80,80);c.stroke();T(SEASON_CN[season],0,18,50,P.second,{disp:1,a:'center'});c.restore();
+  let y=M+150+44;
+  ['一','二','三','四','五','六','日'].forEach((w,i)=>T('周'+w,M+i*(cw+gap)+cw/2,y,22,P.ink2,{a:'center',w:600}));y+=18;
+  const rowY=[];{let yy=y;for(let r=0;r<rows;r++){rowY.push(yy);yy+=rowH[r]+gap}}
+  for(const o of cells){const r=Math.floor(o.k/7),cx=M+(o.k%7)*(cw+gap),cy=rowY[r],h=rowH[r],fut=o.x>tdd,q=st.byDay[o.x];
+    c.globalAlpha=fut?.72:1;R(cx,cy,cw,h,16,P.surface);
+    if(o.x===tdd){c.strokeStyle=P.accent;c.lineWidth=4;c.beginPath();if(c.roundRect)c.roundRect(cx+2,cy+2,cw-4,h-4,14);else c.rect(cx+2,cy+2,cw-4,h-4);c.stroke()}
+    const dw=T(parse(o.x).getDate(),cx+14,cy+36,28,P.ink,{w:700});
+    const sc=showScore&&dayScore(o.x);if(sc){c.font=`700 16px ${SANS}`;const tw=c.measureText(String(sc.total)).width+16;R(cx+22+dw,cy+17,tw,24,12,`rgba(${P.arg},.14)`);T(sc.total,cx+22+dw+tw/2,cy+35,16,P.accent,{a:'center',w:700})}
+    if(o.its.length){const ct=`${q?q.done:o.its.filter(t=>t.done).length}/${o.its.length}`+(q&&q.min?' · '+fmtH(q.min):'');T(ct,cx+cw-12,cy+34,17,P.ink2,{a:'right'})}
+    let yy=cy+56;
+    for(const it of o.L){const t=it.t,lh=it.lines.length*LH;c.fillStyle=col(t.g);c.fillRect(cx+10,yy,3,lh-3);
+      if(t.done)tick(cx+18,yy+3,15,P.good);else ring(cx+25,yy+LH/2-1,6,it.od?P.bad:P.ink2);
+      it.lines.forEach((l,j)=>T(l,cx+38,yy+19+j*LH,FS,it.od?P.bad:t.done?P.ink:P.ink,{w:it.od?700:400}));yy+=lh+5}
+    if(o.its.length>MAXI)T(`还有 ${o.its.length-MAXI} 项`,cx+38,yy+18,17,P.ink2);
+    c.globalAlpha=1}
+  y=rowY[rows-1]+rowH[rows-1]+34;
+  // 图例：状态 + 本月用到的标签
+  let lx=M;tick(lx,y-16,18,P.good);lx+=26;lx+=T('已完成',lx,y,20,P.ink2)+28;ring(lx+8,y-7,7,P.ink2);lx+=24;lx+=T('待做',lx,y,20,P.ink2)+28;ring(lx+8,y-7,7,P.bad);lx+=24;lx+=T('逾期没做',lx,y,20,P.bad,{w:700})+40;
+  const used=new Set();for(const o of cells)for(const it of o.L)used.add(it.t.g||'');
+  for(const g of seriesTags().filter(g=>used.has(g))){if(lx>W-M-160)break;c.fillStyle=col(g);c.fillRect(lx,y-19,4,22);lx+=12;lx+=T(tagName(g),lx,y,20,P.ink2)+26}
+  y+=50;T('四季手账',M,y,28,P.ink2,{disp:1});T('导出于 '+today(),W-M,y,20,P.ink2,{a:'right'});y+=M-8;
+  const out=document.createElement('canvas');out.width=W;out.height=y;const oc=out.getContext('2d'),bg=oc.createLinearGradient(0,0,0,y);bg.addColorStop(0,P.bg1||P.bg);bg.addColorStop(1,P.bg2||P.bg);oc.fillStyle=bg;oc.fillRect(0,0,W,y);oc.drawImage(cv,0,0);
+  const blob=await new Promise(res=>out.toBlob(res,'image/png'));if(!blob)throw new Error('toBlob');
+  return{blob,name:`四季手账-月历横版-${ymOf(a0)}.png`,title}}
+async function landMakeImg(d){const r=await landPoster(d);if(UI.blobUrl)try{URL.revokeObjectURL(UI.blobUrl)}catch(e){}UI.blob=r.blob;UI.blobName=r.name;UI.blobUrl=URL.createObjectURL(r.blob);return r}
+/* 横屏里：导出后直接在横屏界面预览、保存 */
+{const _lh=landHtml;landHtml=function(){
+  if(!UI.landPrev)return _lh().replace('<button class="hbtn" data-act="landNav" data-n="-1"','<button class="hbtn" data-act="landExport">导出图片</button><button class="hbtn" data-act="landNav" data-n="-1"');
+  const canSave=Store.downloads||Store.host==='web';
+  return `<div class="lbox"><div class="lbar"><button class="hbtn" data-act="landPrevX">‹ 返回月历</button><b>${esc(UI.landPrev)}</b><span class="sp"></span>${canSave?'<button class="hbtn pri" data-act="savePng">保存图片</button>':''}<button class="hbtn" data-act="landClose" aria-label="关闭">×</button></div>
+  <div class="lprev"><img src="${UI.blobUrl}" alt="${esc(UI.landPrev)} 横版月历"></div><p class="lhint">${matchMedia('(pointer:coarse)').matches?'也可以长按图片保存。':'也可以右键图片另存为。'}</p></div>`}}
+land.addEventListener('click',async e=>{const b=e.target.closest('[data-act]');if(!b||!land.contains(b))return;const k=b.dataset.act;
+  if(k==='landExport'){e.stopPropagation();if(b.disabled)return;b.disabled=true;b.textContent='生成中…';try{const r=await landMakeImg(UI.landD);UI.landPrev=r.title;landFit()}catch(err){console.error(err);toast('生成图片失败，请重试');b.disabled=false;b.textContent='导出图片'}}
+  else if(k==='landPrevX'){e.stopPropagation();UI.landPrev=null;landFit()}
+  else if(k==='savePng'){e.stopPropagation();ACT.savePng(b,e)}},true);
+{const _lc=landClose;landClose=function(){UI.landPrev=null;_lc()}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!land.hidden&&UI.landPrev){e.preventDefault();e.stopImmediatePropagation();UI.landPrev=null;landFit()}},true);
+/* 月视图「更多」里也能直接导出横版 */
+Object.assign(ACT,{async landExport2(el){if(el.disabled)return;el.disabled=true;try{const r=await landMakeImg(UI.date);openModal(`<h2>横版月历<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2><img src="${UI.blobUrl}" alt="${esc(r.title)} 横版月历"><div class="foot"><span class="small muted sp">长按（手机）或右键（电脑）图片也可以保存。</span>${Store.downloads||Store.host==='web'?'<button class="btn pri" data-act="savePng">保存图片</button>':''}</div>`,true)}catch(e){console.error(e);toast('生成图片失败，请重试')}el.disabled=false}});
+{const _r=render;render=function(f){_r(f);try{if(UI.view==='month'){const hm=main.querySelector('.hmore .hmenu');if(hm&&!hm.querySelector('[data-act=landExport2]')){const ex=hm.querySelector('[data-act=export]');const btn='<button class="hbtn" data-act="landExport2">导出横版月历</button>';if(ex){ex.textContent='导出竖版长图';ex.insertAdjacentHTML('afterend',btn)}else hm.insertAdjacentHTML('beforeend',btn)}}}catch(e){console.error(e)}}}
+/* 手机上「保存图片」走系统分享面板，可以直接存到相册 */
+{const _ws=webSave;webSave=function(name,blob){try{if(/^image\//.test(blob.type)&&matchMedia('(pointer:coarse)').matches&&navigator.canShare){const file=new File([blob],name,{type:blob.type});if(navigator.canShare({files:[file]})){navigator.share({files:[file]}).catch(e=>{if(e&&e.name!=='AbortError')_ws(name,blob)});return}}}catch(e){}_ws(name,blob)}}
+{const h=HELP.find(x=>x[0]==='日历、筛选与搜索');if(h){const i=h[1].findIndex(l=>l.startsWith('月视图右上角'));if(i>=0)h[1][i]+='横屏界面里点「导出图片」可以生成一张横版月历图；月视图的「更多」里也有「导出横版月历」。'}}
 boot();
 </script>
 </body>
