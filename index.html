@@ -563,6 +563,77 @@ a.hbtn{text-decoration:none}
 .ordrow .nm{flex:1;min-width:0}
 .ordrow .btn{min-width:34px;padding:0}
 @media (max-width:640px){.rk{grid-template-columns:repeat(2,minmax(0,1fr))}.rcols{grid-template-columns:minmax(0,1fr)}.rep-top{padding:16px}}
+/* 触屏输入框 16px：iPhone 不再自动放大 */
+@media (pointer:coarse){
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea,.inp,.inp.sm{font-size:16px}
+.inp.sm{height:36px}
+}
+.dlg{max-height:calc(100% - 8px);max-height:calc(100dvh - 32px)}
+/* 月历横屏 */
+.lbtn{margin-left:auto}
+html.landing,html.landing body{overflow:hidden}
+#land{position:fixed;inset:0;z-index:40;background:var(--bg) linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--ink);overflow:hidden}
+#land[hidden]{display:none}
+#land .lbox{position:absolute;inset:0;display:flex;flex-direction:column;gap:6px;padding:8px 12px 10px}
+#land.rot .lbox{inset:auto;top:0;left:0;width:var(--H);height:var(--W);transform-origin:0 0;transform:translateX(var(--W)) rotate(90deg);padding:8px max(12px,env(safe-area-inset-bottom)) 10px max(12px,env(safe-area-inset-top))}
+#land.rot.flip .lbox{transform:translateY(var(--H)) rotate(-90deg);padding:8px max(12px,env(safe-area-inset-top)) 10px max(12px,env(safe-area-inset-bottom))}
+#land .lbar{display:flex;align-items:center;gap:8px;flex:none;min-width:0}
+#land .lbar b{font-size:17px;white-space:nowrap}
+#land .lsum{font-size:12px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#land .lbar .sp{flex:1}
+#land .hbtn{height:32px;min-width:32px;padding:0 10px;border-radius:99px;background:color-mix(in srgb,var(--surface) 80%,transparent);border:1px solid var(--line);color:var(--ink);font-size:14px}
+#land .lgrid{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:minmax(var(--rh,90px),auto);gap:4px;align-content:start;overscroll-behavior:contain}
+#land .lgrid .wh{font-size:11px;color:var(--ink2);text-align:center;align-self:end;padding-bottom:1px;min-height:0}
+#land .lgrid{grid-template-rows:20px}
+#land .lgrid .wh{position:sticky;top:0;z-index:1;align-self:stretch;line-height:20px;padding:0;background:color-mix(in srgb,var(--bg1) 92%,transparent);border-radius:6px}
+#land .ld{min-width:0;display:flex;flex-direction:column;gap:3px;padding:4px 5px;border-radius:9px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 70%,transparent);text-align:left;overflow:hidden}
+#land .ld.today{box-shadow:inset 0 0 0 2px var(--accent);border-color:var(--accent)}
+#land .ld.fut{opacity:.75}
+#land .lh{display:flex;align-items:baseline;gap:4px;min-width:0}
+#land .lh b{font-size:14px;line-height:1.1}
+#land .lh .cnt{margin-left:auto;font-size:10.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#land .its{gap:2px}
+#land .its li{font-size:11.5px;line-height:1.3;align-items:flex-start;border-left-width:2px;padding-left:3px}
+#land .its li>span{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+#land .its li svg{margin-top:2px}
+#land .its li i{margin-top:3px}
+#land .lx{min-width:0}
+/* 共享 */
+.shsteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.shsteps h3,.card h3{font-size:12px;font-weight:600;color:var(--ink2);margin:12px 0 6px}
+.shsteps h3{margin-top:0}
+.invite{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.invite b{font-size:26px;letter-spacing:.12em;font-variant-numeric:tabular-nums}
+.shadd{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+.shadd .f{flex:1 1 120px;min-width:0}
+.shl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.sha{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.sha:first-child{border-top:0}
+.shr1{display:flex;gap:8px;align-items:center}
+.shr1 [name=t]{flex:1 1 auto;min-width:0}
+.shr1 .shdate{width:150px;flex:none}
+@media (max-width:560px){.shr1{flex-wrap:wrap}.shr1 [name=t]{flex-basis:100%}.shr1 .shdate{flex:1}}
+.sha .grow{flex:1;display:flex;flex-direction:column;min-width:0;gap:1px}
+.sha .grow b{font-weight:500;overflow-wrap:anywhere}
+.sha .grow small{font-size:12px;color:var(--ink2)}
+.sha .shd{width:18px;height:18px;flex:none;display:grid;place-items:center;color:var(--good)}
+.sha .shd i{width:14px;height:14px;border-radius:50%;border:1.6px solid var(--ink2)}
+.sha .shd svg{width:16px;height:16px}
+.sha.done .grow b{color:var(--ink2);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--ink2) 50%,transparent)}
+.sha.od .grow small,.sha.od .grow b{color:var(--bad)}
+.sha.declined{opacity:.7}
+.shday{padding:10px 0;border-top:1px solid var(--line)}
+.shday:first-of-type{border-top:0;padding-top:0}
+.shday p{margin:4px 0 0;white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere}
+.shday .pics{margin-top:8px}
+.shtog{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:13px}
+.shtog b{font-weight:600;color:var(--ink2)}
+.shtog.on{border-color:var(--accent);background:rgba(var(--accent-rgb),.1)}
+.shtog.on b{color:var(--accent)}
+.shbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:-4px 0 10px}
+.t-meta .from{color:var(--accent);font-weight:600}
+.t-meta .anote{white-space:normal}
+@media (max-width:640px){.shsteps{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -2433,7 +2504,7 @@ const EX_README=`四季手账 · 数据迁移包
 --------
 data.json          全部数据，一个文件。字段名是完整的英文单词，日期是 YYYY-MM-DD，时间点是 ISO 8601（UTC）。
                    给程序读用这个：结构最完整。
-tasks.csv          事项：每行一件事（日期、标题、标签、是否完成、完成时间、计划分钟、实际分钟、是否重点、是否计划外、顺延次数、所属项目）
+tasks.csv          事项：每行一件事（日期、标题、标签、是否完成、完成时间、计划分钟、实际分钟、是否重点、是否计划外、顺延次数、所属项目、安排人）
 time_logs.csv      计时记录：每行一段用时（属于哪件事、开始时间、分钟数）
 bills.csv          账目：每行一笔（日期、收入/支出、金额、分类、备注）
 day_scores.csv     每日打分：每行一天（总分 0–100、各维度 1–5 分、几点睡、几点起、睡眠小时数）
@@ -2457,7 +2528,7 @@ async function exportAll(withPics){const E=exportData(),enc=new TextEncoder(),fi
   if(withPics&&E.photos.length&&Store.pics){toast(`正在打包 ${E.photos.length} 张照片…`);
     for(const ph of E.photos){try{const p=findPic(ph.id),u=p&&await Pics.url(p);if(!u)throw 0;const b=await(await fetch(u)).blob(),ext=/png/.test(b.type)?'png':/webp/.test(b.type)?'webp':/gif/.test(b.type)?'gif':'jpg';ph.file=`photos/${ph.date}_${ph.id}.${ext}`;files.push({name:ph.file,data:new Uint8Array(await b.arrayBuffer())});got++}catch(e){miss++}}}
   add('README.txt',EX_README.replace(/\n/g,'\r\n'));add('data.json',JSON.stringify(E,null,2));
-  add('tasks.csv',toCsv(E.tasks,[['date','日期'],['title','标题'],['tag','标签'],['done','已完成'],[r=>ymdhm(r.completed_at),'完成时间'],['planned_minutes','计划分钟'],['spent_minutes','实际分钟'],['starred','重点'],['unplanned','计划外'],['postponed_times','顺延次数'],['project','所属项目'],['reminder','提醒时间'],['id','编号']]));
+  add('tasks.csv',toCsv(E.tasks,[['date','日期'],['title','标题'],['tag','标签'],['done','已完成'],[r=>ymdhm(r.completed_at),'完成时间'],['planned_minutes','计划分钟'],['spent_minutes','实际分钟'],['starred','重点'],['unplanned','计划外'],['postponed_times','顺延次数'],['project','所属项目'],['assigned_by','安排人'],['reminder','提醒时间'],['id','编号']]));
   add('time_logs.csv',toCsv(E.time_logs,[['date','日期'],['title','事项'],['tag','标签'],[r=>ymdhm(r.start),'开始时间'],['minutes','分钟'],['task_id','事项编号']]));
   add('bills.csv',toCsv(E.bills,[['date','日期'],[r=>r.type==='income'?'收入':'支出','类型'],['amount','金额'],['category','分类'],['note','备注'],['id','编号']]));
   add('day_scores.csv',toCsv(E.day_scores,[['date','日期'],['total','总分'],...E.score_dimensions.map(d=>[r=>r.scores[d.name],d.name]),['bedtime','入睡'],['wake_time','起床'],['sleep_hours','睡眠小时']]));
@@ -2474,6 +2545,204 @@ Object.assign(ACT,{exportAll(el){if(el.disabled)return;el.disabled=true;const c=
 {const _vp=vPrefs;vPrefs=function(){return _vp().replace('<section class="card"><h2>数据</h2><div class="row">','<section class="card"><h2>数据 <small>备份与迁移</small></h2><div class="row" style="margin-bottom:10px"><button class="btn sm pri" data-act="exportAll">导出迁移包（ZIP）</button><label class="row small" style="gap:6px"><input type="checkbox" id="ex-pics" style="margin:0">包含照片</label></div><p class="small muted" style="margin:0 0 10px">迁移包把全部记录整理成通用格式：可以用 Excel 打开的 CSV 表格、一份带字段说明的 JSON，以及能装回本软件的备份。以后想换软件，或者自己分析数据，都用它。</p><div class="row">')}}
 HELP.push(['数据迁移与备份',['「设置 → 数据 → 导出迁移包」会生成一个 ZIP：事项、计时、账目、打分、小结、项目各一张 CSV 表，外加一份完整的 data.json 和字段说明。','勾选「包含照片」会把原图一起放进去，照片多时文件会比较大。','包里的 backup.json 可以用「导入备份并合并」装回来；合并时同一条记录以较新的为准。','建议每隔一段时间导出一次，自己留一份。']]);
 
+/* ========== 手机：弹窗不再被放大 ========== */
+/* iPhone 的 Safari 在聚焦字号小于 16px 的输入框时会自动放大页面；触屏上输入框统一 16px，弹窗打开时也不自动弹键盘（搜索除外） */
+{const _o=openModal;openModal=function(html,wide){if(matchMedia('(pointer:coarse)').matches&&!/<h2>搜索/.test(html))html=html.replace(/\sautofocus(?=[\s>\/])/g,'');_o(html,wide)}}
+
+/* ========== 月视图：横屏 / 全屏查看 ========== */
+const land=document.createElement('div');land.id='land';land.hidden=true;land.setAttribute('role','dialog');land.setAttribute('aria-modal','true');land.setAttribute('aria-label','月历横屏查看');document.body.appendChild(land);
+const isPhone=()=>matchMedia('(pointer:coarse)').matches&&Math.min(screen.width||innerWidth,screen.height||innerHeight)<600;
+function landHtml(){const d=UI.landD,[a,b]=rangeOf('month',d),D=parse(a),td=today(),n=diffDays(a,b)+1,lead=(D.getDay()+6)%7,rows=Math.ceil((lead+n)/7),st=calc(a,b);
+  let cells='';for(let i=0;i<lead;i++)cells+='<span class="lx"></span>';
+  for(let i=0;i<n;i++){const x=addDays(a,i),its=dayItems(x),s=st.byDay[x],sc=modOn('score')&&dayScore(x),np=dayPics(x).length;
+    cells+=`<button class="ld ${x===td?'today':''} ${x>td?'fut':''}" data-act="landDay" data-d="${x}" aria-label="${mdCN(x)}"><span class="lh"><b class="num">${i+1}</b>${sc?`<span class="scb">${sc.total}</span>`:''}<span class="cnt">${its.length?`${s?s.done:0}/${its.length}`:''}${s&&s.min?' · '+fmtH(s.min):''}${np?` · ${np}图`:''}</span></span>${itemsList(x,9)}</button>`}
+  for(let i=lead+n;i<rows*7;i++)cells+='<span class="lx"></span>';
+  const isCur=ymOf(d)===ymOf(td);
+  return `<div class="lbox"><div class="lbar"><b>${D.getFullYear()} 年 ${D.getMonth()+1} 月</b><span class="lsum">完成 ${st.done}/${st.all}${st.min?' · '+fmtH(st.min):''}${UI.tf?' · 只看 '+esc(tfLabel()):''}</span><span class="sp"></span>
+  <button class="hbtn" data-act="landNav" data-n="-1" aria-label="上个月">‹</button>${isCur?'':'<button class="hbtn" data-act="landNav" data-n="0">本月</button>'}<button class="hbtn" data-act="landNav" data-n="1" aria-label="下个月">›</button>
+  ${land.classList.contains('rot')?'<button class="hbtn" data-act="landFlip" aria-label="换个方向" title="换个方向">⇅</button>':''}<button class="hbtn" data-act="landClose" aria-label="关闭">×</button></div>
+  <div class="lgrid" style="--rows:${rows}">${['一','二','三','四','五','六','日'].map(w=>`<span class="wh">周${w}</span>`).join('')}${cells}</div></div>`}
+function landFit(){if(land.hidden)return;const W=innerWidth,H=innerHeight,rot=H>W&&W<760&&!UI.landLocked;land.classList.toggle('rot',rot);land.classList.toggle('flip',rot&&!!UI.landFlip);land.style.setProperty('--W',W+'px');land.style.setProperty('--H',H+'px');
+  land.innerHTML=landHtml();const g=land.querySelector('.lgrid'),wh=g.querySelector('.wh');if(g){const rows=+g.style.getPropertyValue('--rows')||6,avail=g.clientHeight-(wh?wh.offsetHeight:20)-4*rows;g.style.setProperty('--rh',Math.max(rot||W<760?78:96,Math.floor(avail/rows))+'px')}}
+async function landOpen(){UI.landD=UI.date;UI.landLocked=0;land.hidden=false;document.documentElement.classList.add('landing');landFit();land.querySelector('.lbar .hbtn:last-child').focus({preventScroll:true});
+  if(isPhone()&&innerHeight>innerWidth&&land.requestFullscreen&&screen.orientation&&screen.orientation.lock){try{await land.requestFullscreen({navigationUI:'hide'});await screen.orientation.lock('landscape');UI.landLocked=1}catch(e){UI.landLocked=0}landFit()}}
+function landClose(){if(land.hidden)return;land.hidden=true;land.innerHTML='';document.documentElement.classList.remove('landing');try{if(UI.landLocked&&screen.orientation&&screen.orientation.unlock)screen.orientation.unlock()}catch(e){}UI.landLocked=0;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}
+addEventListener('resize',()=>{if(!land.hidden)landFit()});
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&UI.landLocked){UI.landLocked=0;landFit()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!land.hidden){e.preventDefault();landClose()}});
+land.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||!land.contains(b))return;e.stopPropagation();const k=b.dataset.act;
+  if(k==='landClose')landClose();else if(k==='landNav'){const n=+b.dataset.n;UI.landD=n?shift('month',UI.landD,n):today();landFit()}else if(k==='landFlip'){UI.landFlip=!UI.landFlip;try{localStorage.setItem('sjsz:landflip',UI.landFlip?'1':'')}catch(_){}landFit()}
+  else if(k==='landDay'){const d=b.dataset.d;landClose();UI.date=d;location.hash='day';if(UI.view==='day')render(true);main.scrollTop=0}},true);
+try{UI.landFlip=localStorage.getItem('sjsz:landflip')==='1'}catch(e){}
+Object.assign(ACT,{landOpen(){landOpen()}});
+{const _vm=vMonth;vMonth=function(){const btn=`<button class="btn sm lbtn" data-act="landOpen">${isPhone()?'横屏查看':'全屏查看'}</button>`;return _vm().replace(/(<div class="sec-h">月历[^]*?)<\/div>/,`$1<span class="sp" style="flex:1"></span>${btn}</div>`)}}
+
+/* ========== 共享：关联账号、给对方安排待做、开放小结和照片 ========== */
+NAV.push(['share','共享']);
+NAV2.splice(NAV2.findIndex(n=>n[0]==='prefs'),0,['share','共享','share']);
+ICON.share='<circle cx="7.5" cy="7" r="2.8"/><circle cx="14" cy="8.2" r="2.2"/><path d="M2.5 16.5c.6-3 2.6-4.6 5-4.6s4.4 1.6 5 4.6M12.6 12.4c.5-.2 1-.3 1.5-.3 1.9 0 3.3 1.3 3.8 3.7"/>';
+MODS.push(['share','共享（关联对方账号）']);
+{const _m=modsOf;modsOf=function(){const o=_m(),m=S.meta.mods;return m&&typeof m==='object'&&'share' in m?o:{...o,share:true}}}
+const SH={loaded:false,links:[],names:{},sent:[],recv:[],mine:{},theirs:{},invite:null,busy:false,seen:null,err:'',uid:null,purl:{},stop:null,pick:null,unl:null};
+const shOn=()=>Store.mode==='cloud'&&Store.host==='web'&&!!Store.sb&&!!Store.uid;
+const shKey=()=>'sjsz:sh:'+Store.uid;
+const shName=u=>(SH.names[u]||'').trim()||'对方';
+const shPartner=()=>{const ls=SH.links;if(!ls.length)return null;return ls.find(l=>l.uid===SH.pick)||ls[0]};
+const shDayLbl=d=>{const td=today();return d===td?'今天':d===addDays(td,1)?'明天':d===addDays(td,-1)?'昨天':`${mdCN(d)} 周${WD[parse(d).getDay()]}`};
+function shSave(){try{localStorage.setItem(shKey(),JSON.stringify({links:SH.links,names:SH.names,sent:SH.sent,recv:SH.recv,theirs:SH.theirs,mine:SH.mine,seen:SH.seen}))}catch(e){}}
+function shLoad(){try{const o=JSON.parse(localStorage.getItem(shKey())||'null');if(o){Object.assign(SH,{links:o.links||[],names:o.names||{},sent:o.sent||[],recv:o.recv||[],theirs:o.theirs||{},mine:o.mine||{},seen:o.seen||null});SH.cached=true}}catch(e){}}
+function shStart(){if(!shOn()||!modOn('share'))return;if(SH.uid===Store.uid)return;if(SH.stop)SH.stop();
+  Object.assign(SH,{rec1:0,sig:'',loaded:false,cached:false,links:[],names:{},sent:[],recv:[],mine:{},theirs:{},invite:null,seen:null,err:'',uid:Store.uid,purl:{}});shLoad();
+  const sb=Store.sb,me=Store.uid;let t=0;const kick=()=>{clearTimeout(t);t=setTimeout(shPull,500)};
+  let ch=null;try{ch=sb.channel('sh-'+me).on('postgres_changes',{event:'*',schema:'public',table:'planner_assign',filter:'to_uid=eq.'+me},kick).on('postgres_changes',{event:'*',schema:'public',table:'planner_assign',filter:'from_uid=eq.'+me},kick).subscribe()}catch(e){}
+  const vis=()=>{if(!document.hidden)kick()};document.addEventListener('visibilitychange',vis);addEventListener('online',kick);
+  const iv=setInterval(()=>{if(!document.hidden)shPull()},60000);
+  SH.stop=()=>{clearTimeout(t);clearInterval(iv);document.removeEventListener('visibilitychange',vis);removeEventListener('online',kick);if(ch)try{sb.removeChannel(ch)}catch(e){}};
+  shPull()}
+async function shPull(){if(!shOn()||SH.busy||SH.uid!==Store.uid)return;SH.busy=true;const sb=Store.sb,me=Store.uid,since=addDays(today(),-120);
+  try{const[L,P,A,M,T]=await Promise.all([sb.from('planner_links').select('a,b,created_at'),sb.from('planner_profiles').select('uid,name'),
+      sb.from('planner_assign').select('*').or(`status.eq.open,updated_at.gte.${since}`).order('d'),
+      sb.from('planner_shared').select('owner,d,note,pics,updated_at').eq('owner',me),sb.from('planner_shared').select('owner,d,note,pics,updated_at').neq('owner',me).gte('d',since)]);
+    for(const r of[L,P,A,M,T])if(r.error)throw r.error;
+    if(SH.uid!==me)return;
+    SH.links=(L.data||[]).map(l=>({uid:l.a===me?l.b:l.a,at:l.created_at}));
+    SH.names={};for(const p of P.data||[])SH.names[p.uid]=p.name||'';
+    SH.sent=(A.data||[]).filter(a=>a.from_uid===me);SH.recv=(A.data||[]).filter(a=>a.to_uid===me);
+    SH.mine={};for(const s of M.data||[])SH.mine[s.d]=s;
+    SH.theirs={};for(const s of T.data||[])(SH.theirs[s.owner]=SH.theirs[s.owner]||{})[s.d]=s;
+    SH.loaded=true;SH.err='';shNotify();shSave();const sig=JSON.stringify([SH.links,SH.names,SH.sent,SH.recv,SH.mine,SH.theirs]);SH.changed=sig!==SH.sig;SH.sig=sig;
+  }catch(e){const c=e&&e.code,m=(e&&e.message)||'';SH.err=(c==='42P01'||c==='PGRST205'||/does not exist|schema cache/i.test(m))?'setup':'net'}
+  finally{SH.busy=false}
+  if(SH.loaded){await shReconcile()}
+  if((SH.changed||SH.err)&&(UI.view==='share'||UI.view==='day'))render();SH.changed=false}
+/* 新收到的安排、对方完成了我安排的事：提醒一下 */
+function shNotify(){const first=!SH.seen;SH.seen=SH.seen||{};const nw=[],dn=[];
+  for(const a of SH.recv)if(a.status==='open'&&!SH.seen[a.id]){SH.seen[a.id]='o';nw.push(a)}
+  for(const a of SH.sent){const s=a.status==='done'?'d':'o';if(SH.seen[a.id]!==s){if(s==='d'&&SH.seen[a.id])dn.push(a);SH.seen[a.id]=s}}
+  if(first)return;
+  if(nw.length)toast(`${shName(nw[0].from_uid)}给你安排了${nw.length>1?' '+nw.length+' 件事':'「'+nw[0].t+'」'}，已放进${nw.length>1?'对应的日子':shDayLbl(nw[0].d)+'的待做'}`);
+  else if(dn.length)toast(`${shName(dn[0].to_uid)}完成了${dn.length>1?' '+dn.length+' 件你安排的事':'「'+dn[0].t+'」'}`)}
+/* 把收到的安排放进自己的待做，并把完成情况回传；把开放的日子同步上去 */
+function shFind(aid){const id='a_'+aid;let dead=null;for(const ym in S.months){const t=S.months[ym].tasks&&S.months[ym].tasks[id];if(t){if(!t.del)return t;dead=t}}return dead}
+async function shPatch(a,patch){const{data,error}=await Store.sb.from('planner_assign').update(patch).eq('id',a.id).select().single();if(error)throw error;Object.assign(a,data);return data}
+let shRecBusy=false,shRecT=0;const shKick=()=>{clearTimeout(shRecT);shRecT=setTimeout(shReconcile,1200)};
+async function shReconcile(){if(!shOn()||!SH.loaded||!Store.synced||shRecBusy)return;shRecBusy=true;const docs=new Set();let gone=[];
+  try{const now=Date.now();
+    for(const a of SH.recv){const t=shFind(a.id),su=Date.parse(a.updated_at)||0;
+      if(!t){if(a.status==='open'){const nt={id:'a_'+a.id,t:a.t,d:a.d,g:'',done:0,at:0,plan:a.plan||0,logs:[],c:Date.parse(a.created_at)||now,u:now,aid:a.id,afrom:a.from_uid,an:a.note||'',au:a.updated_at};if(a.rm)nt.rm=a.rm;month(ymOf(a.d),1).tasks[nt.id]=nt;docs.add('m-'+ymOf(a.d))}continue}
+      if(t.del){if(a.status==='open'&&(t.u||0)>su)await shPatch(a,{status:'declined'});continue}
+      if(a.status==='cancelled'){if(!t.done){month(ymOf(t.d)).tasks[t.id]={id:t.id,d:t.d,del:1,u:now};docs.add('m-'+ymOf(t.d));gone.push(a)}continue}
+      if(t.au!==a.updated_at&&su>(t.u||0)){t.t=a.t;t.plan=a.plan||0;t.an=a.note||'';if(a.rm)t.rm=a.rm;else delete t.rm;t.au=a.updated_at;upd(t);docs.add('m-'+ymOf(t.d));if(a.d!==t.d)moveTask(t,a.d).forEach(x=>docs.add(x));continue}
+      const p={};if(t.done&&a.status!=='done'){p.status='done';p.done_at=new Date(t.at||now).toISOString()}
+      else if(!t.done&&a.status!=='open'&&(t.u||0)>su)p.status='open';
+      if(a.d!==t.d&&(t.u||0)>su)p.d=t.d;
+      if(Object.keys(p).length){const r=await shPatch(a,p);const t2=shFind(a.id);if(t2&&!t2.del){t2.au=r.updated_at;docs.add('m-'+ymOf(t2.d))}}}
+    if(SH.links.length){const want={};
+      for(const ym in S.months){const M=S.months[ym],days=new Set(Object.keys(M.notes||{}));for(const p of Object.values(M.pics||{}))if(!p.del)days.add(p.d);
+        for(const d of days){const n=(M.notes||{})[d]||{},note=shFlag(n,'n',d)?(n.t||'').trim():'',pics=shFlag(n,'p',d)?dayPics(d).map(p=>p.id).slice(0,60):[];if(note||pics.length)want[d]={note,pics}}}
+      for(const d in want){const m=SH.mine[d],w=want[d];if(m&&m.note===w.note&&(m.pics||[]).join()===w.pics.join())continue;
+        const{data,error}=await Store.sb.from('planner_shared').upsert({owner:Store.uid,d,note:w.note,pics:w.pics,updated_at:new Date().toISOString()},{onConflict:'owner,d'}).select().single();if(error)throw error;SH.mine[d]=data}
+      for(const d of Object.keys(SH.mine))if(!want[d]){const{error}=await Store.sb.from('planner_shared').delete().eq('owner',Store.uid).eq('d',d);if(error)throw error;delete SH.mine[d]}}
+    shSave();
+  }catch(e){console.warn('share sync',e)}
+  finally{shRecBusy=false}
+  if(docs.size)commit(...docs);
+  if(gone.length)toast(`${shName(gone[0].from_uid)}取消了「${gone[0].t}」${gone.length>1?'等 '+gone.length+' 件事':''}`)}
+function shFlag(n,k,d){const v=n['sh'+k];if(v===0||v===1)return v;const df=S.meta.shareDef||{};return df[k]&&d>=(df.from||'9999')?1:0}
+{const _c=commit;commit=function(...d){_c(...d);if(SH.loaded&&shOn())shKick()}}
+{const _n=INP.note;INP.note=function(el){const d=UI.date,M=month(ymOf(d),1),o=M.notes[d]||{};M.notes[d]={...o,t:el.value,u:Date.now()};touch('m-'+ymOf(d));if(SH.loaded&&shOn())shKick()}}
+/* 收到的事在待做里标出来源 */
+{const _tr=taskRow;taskRow=function(t){let h=_tr(t);if(t.aid)h=h.replace('<span class="t-meta">',`<span class="t-meta"><span class="from">来自 ${esc(shName(t.afrom))}</span>${t.an?`<span class="anote">${esc(t.an)}</span>`:''}`);return h}}
+
+function shAssignRow(a){const td=today(),od=a.status==='open'&&a.d<td,meta=[];
+  if(a.plan)meta.push(`预计 ${fmtMin(a.plan)}`);if(a.rm)meta.push(`提醒 ${esc(a.rm)}`);
+  if(a.status==='done'&&a.done_at)meta.push(`${mdCN(ymd(new Date(a.done_at)))} ${hm(Date.parse(a.done_at))} 完成`);
+  if(a.status==='declined')meta.push('对方从待做里删掉了');
+  return `<li class="sha ${a.status} ${od?'od':''}"><span class="shd">${a.status==='done'?CHK:'<i></i>'}</span><span class="grow"><b>${esc(a.t)}</b><small>${shDayLbl(a.d)}${od?' · 已过期':''}${meta.length?' · '+meta.join(' · '):''}</small>${a.note?`<small class="muted">${esc(a.note)}</small>`:''}</span>
+  ${a.status==='open'?`<button class="btn sm ghost" data-act="shEdit" data-id="${esc(a.id)}">修改</button><button class="btn sm ghost" data-act="shCancel" data-id="${esc(a.id)}">取消</button>`:a.status==='done'?'':`<button class="btn sm ghost" data-act="shDel" data-id="${esc(a.id)}">移除</button>`}</li>`}
+function shareHtml(){
+  const head=sub=>`<header class="hero hero-s"><div class="big txt">共享</div><div class="ht"><span>${sub}</span></div></header>`;
+  if(!shOn())return `<div class="wrap">${head('和另一个账号互相安排待做')}<section class="card"><h2>登录后可用</h2><p class="muted" style="margin:0 0 12px">共享需要两个人各自登录自己的账号。${Store.host==='claude'?'请在网页版（GitHub Pages 上的地址）里使用这个功能。':''}</p>${Store.host==='web'?'<button class="btn pri" data-act="authOpen">登录 / 注册</button>':''}</section></div>`;
+  if(SH.err==='setup')return `<div class="wrap">${head('')}<section class="card"><h2>数据库还没准备好</h2><p class="muted" style="margin:0">需要先在 Supabase 里运行 supabase-share.sql。</p></section></div>`;
+  if(!SH.loaded&&!SH.cached)return `<div class="wrap">${head('')}<section class="card"><p class="muted" style="margin:0">${SH.err==='net'?'连不上服务器，联网后会自动刷新。':'正在加载…'}</p></section></div>`;
+  const me=Store.uid,P=shPartner(),nm=SH.names[me]||'';
+  const nameForm=`<form class="row" data-sub="shName" style="gap:8px;flex-wrap:nowrap"><input class="inp" name="n" maxlength="40" value="${esc(nm)}" placeholder="对方看到的你的称呼" aria-label="我的称呼"><button class="btn">${nm?'保存':'设置'}</button></form>`;
+  const inv=SH.invite?`<div class="invite"><b class="num">${SH.invite.code.slice(0,4)} ${SH.invite.code.slice(4)}</b><span class="small muted">把这串字告诉对方，在对方的「共享」页输入即可关联。3 天内有效，用一次就失效。</span><button class="btn sm" data-act="shCopy">复制</button></div>`:`<button class="btn" data-act="shInvite">生成邀请码</button>`;
+  const join=`<form class="row" data-sub="shJoin" style="gap:8px;flex-wrap:nowrap"><input class="inp" name="c" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="输入对方的邀请码" aria-label="对方的邀请码"><button class="btn pri">关联</button></form>`;
+  if(!P)return `<div class="wrap">${head('和另一个账号互相安排待做')}
+    <section class="card"><h2>关联对方的账号</h2><p class="muted" style="margin:0 0 14px">关联后，你们可以给对方安排待做，对方完成时你会看到。每天的小结和照片默认只有自己能看，你可以选择某些天开放给对方。</p>
+      <div class="shsteps"><div><h3>1. 先设一个称呼</h3>${nameForm}</div><div><h3>2. 一方生成邀请码</h3>${inv}</div><div><h3>3. 另一方输入</h3>${join}</div></div></section></div>`;
+  const pn=shName(P.uid),td=today(),sent=SH.sent.filter(a=>a.to_uid===P.uid),recv=SH.recv.filter(a=>a.from_uid===P.uid);
+  const open=sent.filter(a=>a.status==='open').sort((a,b)=>a.d<b.d?-1:1),done=sent.filter(a=>a.status==='done').sort((a,b)=>(b.done_at||'')<(a.done_at||'')?-1:1).slice(0,15),dec=sent.filter(a=>a.status==='declined');
+  const rOpen=recv.filter(a=>a.status==='open'),rDone=recv.filter(a=>a.status==='done');
+  const days=Object.values(SH.theirs[P.uid]||{}).sort((a,b)=>a.d<b.d?1:-1);
+  const myDays=Object.keys(SH.mine).length,df=S.meta.shareDef||{};
+  const tog=(k,lab)=>`<button class="shtog ${df[k]?'on':''}" data-act="shDef" data-k="${k}" aria-pressed="${!!df[k]}">${lab}<b>${df[k]?'开放':'私密'}</b></button>`;
+  const pick=SH.links.length>1?`<span class="seg" role="group" aria-label="选择对方">${SH.links.map(l=>`<button data-act="shPick" data-u="${l.uid}" aria-pressed="${l.uid===P.uid}">${esc(shName(l.uid))}</button>`).join('')}</span>`:'';
+  return `<div class="wrap">${head(`和 ${esc(pn)} 一起`)}${pick}
+  <section class="card"><h2>给 ${esc(pn)} 安排 <small>${[open.length?`待做 ${open.length} 件`:'',done.length?`最近完成 ${done.length} 件`:''].filter(Boolean).join(' · ')}</small></h2>
+    <form class="shadd" data-sub="shAdd"><div class="shr1"><input class="inp" name="t" maxlength="200" required placeholder="要 ${esc(pn)} 做的事" aria-label="安排的事"><input class="inp shdate" type="date" name="d" value="${td}" min="${addDays(td,-7)}" required aria-label="哪一天"><button class="btn pri">安排</button></div>
+      <details class="how"><summary>提醒、预计用时、补充说明</summary><div class="row" style="gap:8px;margin-top:8px"><label class="f">提醒<input class="inp sm" type="time" name="rm"></label><label class="f">预计分钟<input class="inp sm num" type="number" name="plan" min="0" max="1440" step="5" placeholder="可不填"></label></div><input class="inp" name="note" maxlength="1000" placeholder="补充说明（可不填）" aria-label="补充说明" style="margin-top:8px"></details></form>
+    ${open.length?`<h3>还没做</h3><ul class="shl">${open.map(shAssignRow).join('')}</ul>`:''}
+    ${done.length?`<h3>已完成</h3><ul class="shl">${done.map(shAssignRow).join('')}</ul>`:''}
+    ${dec.length?`<h3>对方删掉的</h3><ul class="shl">${dec.map(shAssignRow).join('')}</ul>`:''}
+    ${!open.length&&!done.length&&!dec.length?`<p class="empty">安排的事会直接出现在 ${esc(pn)} 当天的待做里，完成后这里会打勾。</p>`:''}</section>
+  <section class="card"><h2>${esc(pn)} 安排给我的 <small>${rOpen.length?`待做 ${rOpen.length} 件`:'都做完了'}${rDone.length?` · 已完成 ${rDone.length} 件`:''}</small></h2>
+    ${recv.length?`<ul class="shl">${recv.filter(a=>a.status!=='cancelled').sort((a,b)=>a.d<b.d?1:-1).slice(0,12).map(a=>`<li class="sha ${a.status} ${a.status==='open'&&a.d<td?'od':''}"><span class="shd">${a.status==='done'?CHK:'<i></i>'}</span><span class="grow"><b>${esc(a.t)}</b><small>${shDayLbl(a.d)}${a.status==='declined'?' · 你删掉了':''}</small></span><button class="btn sm ghost" data-act="goDay" data-d="${a.d}">去那天</button></li>`).join('')}</ul>`:`<p class="empty">${esc(pn)} 安排的事会自动放进你对应那天的待做，标着「来自 ${esc(pn)}」。</p>`}</section>
+  <section class="card"><h2>${esc(pn)} 开放的日子 <small>${days.length?`最近 ${days.length} 天`:''}</small></h2>
+    ${days.length?days.slice(0,30).map(s=>`<div class="shday"><b>${shDayLbl(s.d)}</b>${s.note?`<p>${esc(s.note)}</p>`:''}${(s.pics||[]).length?`<div class="pics">${s.pics.map(id=>`<button class="ph" data-act="shPic" data-k="${esc(P.uid+'/'+id)}" data-d="${s.d}" aria-label="查看照片"><img data-shpic="${esc(P.uid+'/'+id)}" ${SH.purl[P.uid+'/'+id]?`src="${SH.purl[P.uid+'/'+id]}"`:''} alt="${shDayLbl(s.d)} 的照片" loading="lazy"></button>`).join('')}</div>`:''}</div>`).join(''):`<p class="empty">${esc(pn)} 还没有开放任何一天的小结或照片。</p>`}</section>
+  <section class="card"><h2>我开放给 ${esc(pn)} 的 <small>${myDays?`已开放 ${myDays} 天`:'目前全部私密'}</small></h2>
+    <p class="small muted" style="margin:0 0 10px">在今日页的「当日小结」里，可以单独决定那一天的小结和照片给不给 ${esc(pn)} 看。下面是新的日子默认怎么处理（只对今天及以后生效）：</p>
+    <div class="row" style="gap:8px">${tog('n','小结')}${tog('p','照片')}</div></section>
+  <section class="card" data-fold="sh-set"><h2>称呼与关联</h2><div style="display:flex;flex-direction:column;gap:14px"><div><h3>我的称呼</h3>${nameForm}</div><div><h3>再关联一个人</h3>${inv}<div style="margin-top:8px">${join}</div></div>
+    <div><h3>解除和 ${esc(pn)} 的关联</h3><p class="small muted" style="margin:0 0 8px">解除后双方都看不到对方开放的内容，也不能再互相安排；已经放进待做的事会留着。</p><button class="btn sm danger" data-act="shUnlink" data-u="${P.uid}">${SH.unl===P.uid?'确定解除？再点一次':'解除关联'}</button></div></div></section></div>`}
+function shHydrate(){main.querySelectorAll('img[data-shpic]:not([src])').forEach(async img=>{const k=img.dataset.shpic;try{if(!SH.purl[k]){const{data,error}=await Store.sb.storage.from(SUPA_B).download(k+'.jpg');if(error||!data)throw 0;SH.purl[k]=URL.createObjectURL(data)}if(img.isConnected)img.src=SH.purl[k]}catch(e){if(img.parentNode)img.parentNode.classList.add('miss')}})}
+const shRow=id=>SH.sent.find(a=>a.id===id);
+const shErr=e=>{const c=e&&e.code,m=(e&&e.message)||'';return c==='P0002'||/invite not found/.test(m)?'邀请码不对，或已经过期':c==='22023'||/own invite/.test(m)?'这是你自己的邀请码，要让对方输入':c==='42501'||/row-level|not allowed/.test(m)?'没有权限，可能已经解除了关联':'没有成功，检查一下网络'};
+Object.assign(SUB,{
+  async shName(f){const n=f.n.value.trim().slice(0,40),b=f.querySelector('button');b.disabled=true;try{const{error}=await Store.sb.from('planner_profiles').upsert({uid:Store.uid,name:n,updated_at:new Date().toISOString()},{onConflict:'uid'});if(error)throw error;SH.names[Store.uid]=n;shSave();toast('称呼已保存');render(true)}catch(e){toast(shErr(e))}b.disabled=false},
+  async shJoin(f){const c=f.c.value.replace(/\s/g,'').toUpperCase();if(c.length!==8){toast('邀请码是 8 位');return}const b=f.querySelector('button');b.disabled=true;
+    try{const{data,error}=await Store.sb.rpc('planner_accept_invite',{p_code:c});if(error)throw error;SH.pick=data;toast('已关联');f.reset();await shPull();render(true)}catch(e){toast(shErr(e))}b.disabled=false},
+  async shAdd(f){const P=shPartner();if(!P)return;const t=f.t.value.trim();if(!t)return;const row={id:uid(),to_uid:P.uid,d:f.d.value||today(),t:t.slice(0,200),note:f.note.value.trim().slice(0,1000),plan:Math.max(0,Math.min(1440,+f.plan.value||0)),rm:f.rm.value||''};
+    const tmp={...row,from_uid:Store.uid,status:'open',created_at:new Date().toISOString(),updated_at:new Date().toISOString()};SH.sent.push(tmp);if(!SH.seen)SH.seen={};SH.seen[row.id]='o';UI.focus='.shadd [name=t]';render(true);
+    try{const{data,error}=await Store.sb.from('planner_assign').insert(row).select().single();if(error)throw error;Object.assign(tmp,data);shSave();toast(`已安排给 ${shName(P.uid)}：${shDayLbl(row.d)}`)}catch(e){SH.sent=SH.sent.filter(a=>a!==tmp);toast(shErr(e))}render(true)},
+  async shEditSave(f){const a=shRow(f.dataset.id);if(!a)return;const p={t:f.t.value.trim().slice(0,200),d:f.d.value,note:f.note.value.trim().slice(0,1000),plan:Math.max(0,Math.min(1440,+f.plan.value||0)),rm:f.rm.value||''};if(!p.t)return;
+    try{await shPatch(a,p);closeModal();shSave();toast('已修改');render(true)}catch(e){toast(shErr(e))}},
+});
+Object.assign(ACT,{
+  async shInvite(el){el.disabled=true;const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=crypto.getRandomValues(new Uint8Array(8)),code=[...r].map(x=>A[x%32]).join('');
+    try{await Store.sb.from('planner_invites').delete().eq('owner',Store.uid);const{error}=await Store.sb.from('planner_invites').insert({code});if(error)throw error;SH.invite={code};render(true)}catch(e){toast(shErr(e));el.disabled=false}},
+  async shCopy(){if(!SH.invite)return;try{await navigator.clipboard.writeText(SH.invite.code);toast('已复制邀请码')}catch(e){toast('复制没有成功，手动抄一下吧')}},
+  shPick(el){SH.pick=el.dataset.u;render(true)},
+  async shCancel(el){const a=shRow(el.dataset.id);if(!a)return;el.disabled=true;try{await shPatch(a,{status:'cancelled'});shSave();toast('已取消，对方的待做里也会移除')}catch(e){toast(shErr(e))}render(true)},
+  async shDel(el){const a=shRow(el.dataset.id);if(!a)return;try{const{error}=await Store.sb.from('planner_assign').delete().eq('id',a.id);if(error)throw error;SH.sent=SH.sent.filter(x=>x!==a);shSave()}catch(e){toast(shErr(e))}render(true)},
+  shEdit(el){const a=shRow(el.dataset.id);if(!a)return;openModal(`<h2>修改安排<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2>
+    <form data-sub="shEditSave" data-id="${esc(a.id)}" style="display:flex;flex-direction:column;gap:12px"><label class="f">要做的事<input class="inp" name="t" maxlength="200" value="${esc(a.t)}" required></label>
+    <div class="row" style="gap:8px"><label class="f">日期<input class="inp sm" type="date" name="d" value="${a.d}" required></label><label class="f">提醒<input class="inp sm" type="time" name="rm" value="${esc(a.rm||'')}"></label><label class="f">预计分钟<input class="inp sm num" type="number" name="plan" min="0" max="1440" step="5" value="${a.plan||''}"></label></div>
+    <label class="f">补充说明<input class="inp" name="note" maxlength="1000" value="${esc(a.note||'')}"></label><div class="foot"><button type="button" class="btn ghost" data-act="close">算了</button><button class="btn pri">保存</button></div></form>`)},
+  async shUnlink(el){const u=el.dataset.u;if(SH.unl!==u){SH.unl=u;render(true);return}SH.unl=null;el.disabled=true;
+    try{const{error}=await Store.sb.from('planner_links').delete().in('a',[Store.uid,u]).in('b',[Store.uid,u]);if(error)throw error;SH.links=SH.links.filter(l=>l.uid!==u);delete SH.theirs[u];SH.pick=null;shSave();toast('已解除关联')}catch(e){toast(shErr(e))}render(true)},
+  shDef(el){const k=el.dataset.k,df={n:0,p:0,...(S.meta.shareDef||{})};df[k]=df[k]?0:1;df.from=today();S.meta.shareDef=df;commit('meta');toast(df[k]?`从今天起，新的${k==='n'?'小结':'照片'}默认开放给对方`:`新的${k==='n'?'小结':'照片'}默认私密`)},
+  shDay(el){const d=UI.date,k=el.dataset.k,M=month(ymOf(d),1),o=M.notes[d]||{t:''},v=shFlag(o,k,d)?0:1;M.notes[d]={...o,['sh'+k]:v,u:Date.now()};commit('m-'+ymOf(d))},
+  async shPic(el){const k=el.dataset.k,u=SH.purl[k];if(!u)return;openModal(`<h2>${shDayLbl(el.dataset.d)} 的照片<span class="sp"></span><button class="x" data-act="close" aria-label="关闭">×</button></h2><img src="${u}" alt="照片">`,true)},
+});
+/* 今日页：开放开关、给对方的事的进度 */
+function shDayBar(d){const P=shPartner();if(!P||!modOn('note'))return'';const M=S.months[ymOf(d)],n=(M&&M.notes[d])||{},pn=esc(shName(P.uid)),b=k=>{const on=shFlag(n,k,d);return `<button class="shtog ${on?'on':''}" data-act="shDay" data-k="${k}" aria-pressed="${!!on}">${k==='n'?'小结':'照片'}<b>${on?'开放':'私密'}</b></button>`};
+  const ok=SH.mine[d],pending=(shFlag(n,'n',d)&&(n.t||'').trim()&&!(ok&&ok.note))||(shFlag(n,'p',d)&&dayPics(d).length&&!(ok&&(ok.pics||[]).length));
+  return `<div class="shbar"><span class="small muted">给 ${pn} 看：</span>${b('n')}${b('p')}${pending?'<span class="small muted">同步中…</span>':''}</div>`}
+function shDayCard(d){const P=shPartner();if(!P)return'';const xs=SH.sent.filter(a=>a.to_uid===P.uid&&a.d===d&&a.status!=='cancelled');if(!xs.length)return'';const dn=xs.filter(a=>a.status==='done').length,o=FOLD_ALL||FOLD['d-share'];
+  return `<section class="card" data-fold="d-share"><h2>给 ${esc(shName(P.uid))} 安排的 <small>${dn}/${xs.length} 完成</small></h2><ul class="shl">${xs.map(a=>`<li class="sha ${a.status}"><span class="shd">${a.status==='done'?CHK:'<i></i>'}</span><span class="grow"><b>${esc(a.t)}</b>${a.status==='done'&&a.done_at?`<small>${hm(Date.parse(a.done_at))} 完成</small>`:a.status==='declined'?'<small>对方删掉了</small>':''}</span></li>`).join('')}</ul><p class="small" style="margin:8px 0 0"><a class="lnk" href="#share">去共享页</a></p></section>`}
+{const _r=render;render=function(f){
+  if(UI.view==='share'&&(Store.mode==='cloud'||Store.mode==='local')){if(!f&&typingInMain()){UI.pending=true;return}UI.pending=false;applySeason();main.innerHTML=shareHtml();renderSide();document.querySelectorAll('#side .nav a,#tabbar a').forEach(a=>{const h=a.getAttribute('href');if((h==='#money'&&!modOn('money'))||(h==='#projects'&&!modOn('proj'))||(h==='#report'&&!modOn('report')))a.remove()});renderTimer();postRender();try{addHelpLink()}catch(e){}if(shOn())shHydrate();if(UI.focus){const el=main.querySelector(UI.focus);UI.focus=null;if(el)el.focus()}shStart();return}
+  _r(f);try{
+    if(Store.mode==='cloud'||Store.mode==='local'){if(!shOn()||!modOn('share'))document.querySelectorAll('#side .nav a[href="#share"],#tabbar a[href="#share"]').forEach(a=>a.remove());if(shOn()&&modOn('share')){shStart();if(SH.loaded&&Store.synced&&!SH.rec1){SH.rec1=1;shKick()}}}
+    if(UI.view==='day'&&shOn()&&SH.links.length){const nt=main.querySelector('[data-fold=d-note]>h2');if(nt&&!main.querySelector('.shbar')){nt.insertAdjacentHTML('afterend',shDayBar(UI.date));const M=S.months[ymOf(UI.date)],n=(M&&M.notes[UI.date])||{},on=[shFlag(n,'n',UI.date)?'小结':'',shFlag(n,'p',UI.date)?'照片':''].filter(Boolean);const sm=nt.querySelector('small');if(sm&&on.length)sm.insertAdjacentHTML('beforeend',` · ${on.join('、')}对 ${esc(shName(shPartner().uid))} 开放`)}
+      const c=shDayCard(UI.date);if(c&&!main.querySelector('[data-fold=d-share]')){const lab=main.querySelector('.auxlab');if(lab){lab.insertAdjacentHTML('afterend',c);postRender()}}}
+    if(!land.hidden)landFit();
+  }catch(e){console.error(e)}}}
+HELP.splice(HELP.length-1,0,['共享',['在「共享」页设一个称呼，一方生成邀请码，另一方输入，两个账号就关联上了。','「给 TA 安排」的事会直接出现在对方那天的待做里，标着「来自 某某」；对方完成后你这边会打勾，并收到提醒。','对方安排的事你可以像自己的事一样计时、顺延；不想做就删掉，对方会看到「对方删掉了」。','每天的小结和照片默认私密。在今日页「当日小结」下面可以单独开放那一天；共享页里可以设置新的日子默认开放。','解除关联后，双方都看不到对方开放的内容。']]);
+{const _e=exportData;exportData=function(){const E=_e(),by={};for(const ym in S.months)for(const t of Object.values(S.months[ym].tasks||{}))if(t.aid&&!t.del)by[t.id]=t;for(const x of E.tasks){const t=by[x.id];x.assigned_by=t?shName(t.afrom):''}return E}}
+{const h=HELP.find(x=>x[0]==='日历、筛选与搜索');if(h)h[1].splice(1,0,'月视图右上角的「横屏查看」：手机竖着拿时会把月历转成横向，把手机横过来看，每天的事显示得更完整；点「⇅」换方向。电脑和平板上是全屏查看。')}
 boot();
 </script>
 </body>
